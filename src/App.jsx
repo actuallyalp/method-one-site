@@ -5,6 +5,7 @@ const ACCENT = "#8E090B";
 const DARK = "#07090f";
 const HERO_VIDEO_MOV_SRC = "/Method 1.mov";
 const HERO_VIDEO_MP4_SRC = "/Method 1.mp4";
+const FORM_ENDPOINT = "https://formspree.io/f/mwvyvvpb";
 
 const fontStyles = `
 @font-face {

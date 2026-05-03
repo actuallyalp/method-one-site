@@ -317,74 +317,127 @@ function ScrollBriefcaseExperience() {
   const targetRef = React.useRef(null);
   const { scrollYProgress } = useScroll({ target: targetRef, offset: ["start start", "end end"] });
 
-  const caseRotateY = useTransform(scrollYProgress, [0, 0.22, 0.42, 1], [-18, 372, 382, 390]);
-  const caseRotateX = useTransform(scrollYProgress, [0, 0.28, 0.48, 1], [4, -8, -2, 0]);
-  const caseScale = useTransform(scrollYProgress, [0, 0.24, 0.65, 1], [0.82, 1, 0.86, 0.72]);
-  const caseY = useTransform(scrollYProgress, [0, 0.45, 1], [60, 0, -80]);
-  const lidRotate = useTransform(scrollYProgress, [0.22, 0.42], [0, -112]);
-  const glowOpacity = useTransform(scrollYProgress, [0.15, 0.42, 0.75], [0.1, 0.75, 0.25]);
-  const captionOpacity = useTransform(scrollYProgress, [0, 0.18, 0.74, 1], [1, 1, 0.65, 0]);
-  const finalOpacity = useTransform(scrollYProgress, [0.74, 0.92], [0, 1]);
+  const sceneScale = useTransform(scrollYProgress, [0, 0.14, 0.75, 1], [0.92, 1, 1.04, 0.92]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.06, 0.9, 1], [0, 1, 1, 0]);
+  const sceneBlur = useTransform(scrollYProgress, [0, 0.08, 0.9, 1], ["blur(18px)", "blur(0px)", "blur(0px)", "blur(16px)"]);
+
+  const caseRotateY = useTransform(scrollYProgress, [0, 0.16, 0.33, 0.55, 1], [-32, 120, 360, 382, 396]);
+  const caseRotateX = useTransform(scrollYProgress, [0, 0.22, 0.45, 0.78, 1], [14, -11, -4, 6, 0]);
+  const caseRotateZ = useTransform(scrollYProgress, [0, 0.2, 0.46, 1], [-3, 2, 0, 0]);
+  const caseScale = useTransform(scrollYProgress, [0, 0.22, 0.52, 0.82, 1], [0.62, 1.08, 0.98, 0.82, 0.62]);
+  const caseY = useTransform(scrollYProgress, [0, 0.25, 0.7, 1], [150, 0, -40, -160]);
+  const caseZ = useTransform(scrollYProgress, [0, 0.3, 0.62, 1], [0, 190, 80, -220]);
+
+  const lidRotate = useTransform(scrollYProgress, [0.34, 0.52, 0.72], [0, -126, -118]);
+  const lidZ = useTransform(scrollYProgress, [0.34, 0.58], [0, -60]);
+  const lidGlow = useTransform(scrollYProgress, [0.28, 0.5, 0.76], [0, 1, 0.35]);
+  const innerLightOpacity = useTransform(scrollYProgress, [0.32, 0.54, 0.86], [0, 0.95, 0.18]);
+
+  const introOpacity = useTransform(scrollYProgress, [0.02, 0.18, 0.34], [1, 1, 0]);
+  const unlockOpacity = useTransform(scrollYProgress, [0.75, 0.91], [0, 1]);
+  const nextSectionReveal = useTransform(scrollYProgress, [0.82, 1], [60, 0]);
+
+  const tunnelY = useTransform(scrollYProgress, [0, 1], [0, -260]);
+  const tunnelScale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.35, 1.85]);
+  const gridOpacity = useTransform(scrollYProgress, [0, 0.36, 0.8, 1], [0.08, 0.22, 0.12, 0]);
 
   const supplies = [
-    { label: "Surgical", type: "box", x: -330, y: -170, rotate: -16 },
-    { label: "Dental", type: "syringe", x: 270, y: -125, rotate: 18 },
-    { label: "PPE", type: "mask", x: -250, y: 140, rotate: 12 },
-    { label: "Lab", type: "bottle", x: 285, y: 135, rotate: -12 },
+    { label: "Surgical", type: "box", x: -390, y: -190, rotate: -20, z: 160 },
+    { label: "Dental", type: "syringe", x: 345, y: -145, rotate: 19, z: 240 },
+    { label: "PPE", type: "mask", x: -320, y: 160, rotate: 14, z: 210 },
+    { label: "Lab", type: "bottle", x: 340, y: 155, rotate: -14, z: 190 },
   ];
 
   return (
-    <section id="briefcase" ref={targetRef} className="relative z-10 h-[420vh] bg-[#07090f]">
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden px-5 py-24 md:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(142,9,11,0.26),transparent_34%),radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_22%),linear-gradient(180deg,#07090f,#0b111d,#07090f)]" />
-        <motion.div
-          aria-hidden="true"
-          style={{ opacity: glowOpacity }}
-          className="absolute left-1/2 top-1/2 h-[680px] w-[680px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8E090B] blur-[120px]"
-        />
+    <section id="briefcase" ref={targetRef} className="relative z-10 h-[560vh] bg-[#07090f]">
+      <div className="sticky top-0 h-screen overflow-hidden px-5 md:px-8">
+        <motion.div style={{ opacity: sceneOpacity, scale: sceneScale, filter: sceneBlur }} className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_46%,rgba(142,9,11,0.34),transparent_32%),radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.1),transparent_20%),radial-gradient(circle_at_82%_20%,rgba(255,255,255,0.08),transparent_22%),linear-gradient(180deg,#07090f_0%,#101827_48%,#07090f_100%)]" />
 
-        <motion.div style={{ opacity: captionOpacity }} className="absolute left-5 top-28 z-30 max-w-md md:left-12">
-          <div className="text-sm font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Pinned Fulfillment Sequence</div>
-          <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] text-white md:text-6xl">Scroll into the supply case.</h2>
-          <p className="mt-5 text-base leading-7 text-red-100/65">The briefcase spins, opens, and releases the core supply categories before the page continues.</p>
+          <motion.div
+            aria-hidden="true"
+            style={{ y: tunnelY, scale: tunnelScale, opacity: gridOpacity }}
+            className="absolute inset-[-20%] [background-image:linear-gradient(to_right,rgba(255,255,255,0.26)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:90px_90px] [transform:rotateX(64deg)_translateY(220px)]"
+          />
+
+          <motion.div
+            aria-hidden="true"
+            style={{ opacity: lidGlow }}
+            className="absolute left-1/2 top-1/2 h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8E090B] blur-[130px]"
+          />
+
+          <motion.div
+            aria-hidden="true"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 h-[820px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-red-950/40"
+          />
+          <motion.div
+            aria-hidden="true"
+            animate={{ rotate: [360, 0] }}
+            transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 h-[540px] w-[540px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
+          />
         </motion.div>
 
-        <motion.div style={{ opacity: finalOpacity }} className="absolute bottom-16 left-1/2 z-30 w-full max-w-3xl -translate-x-1/2 px-5 text-center">
-          <div className="rounded-[2rem] border border-red-950/60 bg-black/35 p-6 backdrop-blur-xl">
-            <div className="text-xs font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Unlocked</div>
-            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white md:text-5xl">Every request leaves the case organized.</h3>
+        <motion.div style={{ opacity: introOpacity }} className="absolute left-5 top-28 z-30 max-w-md md:left-12">
+          <div className="text-sm font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Pinned Fulfillment Sequence</div>
+          <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] text-white md:text-6xl">The request enters the case.</h2>
+          <p className="mt-5 text-base leading-7 text-red-100/65">Scroll slowly. The page stays locked while the briefcase spins, opens, and releases the supply categories.</p>
+        </motion.div>
+
+        <motion.div style={{ opacity: unlockOpacity, y: nextSectionReveal }} className="absolute bottom-12 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-5 text-center">
+          <div className="rounded-[2rem] border border-red-950/60 bg-black/45 p-6 shadow-2xl shadow-black/40 backdrop-blur-2xl">
+            <div className="text-xs font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Sequence Complete</div>
+            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white md:text-5xl">Supplies are sorted. The workflow is unlocked.</h3>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-red-100/60">The page releases after the animation because the pinned section ends here.</p>
           </div>
         </motion.div>
 
-        <div className="relative z-20 h-[620px] w-full max-w-6xl [perspective:1600px]">
+        <div className="absolute inset-0 z-20 flex items-center justify-center [perspective:2200px]">
           <motion.div
-            style={{ rotateY: caseRotateY, rotateX: caseRotateX, scale: caseScale, y: caseY }}
-            className="absolute left-1/2 top-1/2 h-[260px] w-[440px] -translate-x-1/2 -translate-y-1/2 [transform-style:preserve-3d]"
+            style={{
+              rotateY: caseRotateY,
+              rotateX: caseRotateX,
+              rotateZ: caseRotateZ,
+              scale: caseScale,
+              y: caseY,
+              z: caseZ,
+            }}
+            className="relative h-[290px] w-[480px] [transform-style:preserve-3d]"
           >
             <motion.div
-              style={{ rotateX: lidRotate, transformOrigin: "50% 100%" }}
-              className="absolute left-0 top-[-132px] h-[150px] w-full rounded-t-[2rem] border border-red-900/60 bg-gradient-to-br from-zinc-800 via-zinc-950 to-black shadow-2xl shadow-black/40 [transform-style:preserve-3d]"
+              style={{ rotateX: lidRotate, z: lidZ, transformOrigin: "50% 100%" }}
+              className="absolute left-0 top-[-158px] h-[176px] w-full rounded-t-[2.25rem] border border-red-900/70 bg-gradient-to-br from-zinc-700 via-zinc-950 to-black shadow-2xl shadow-black/50 [transform-style:preserve-3d]"
             >
-              <div className="absolute inset-5 rounded-t-[1.4rem] border border-white/8 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.16),transparent_24%)]" />
-              <div className="absolute left-1/2 top-[-44px] h-16 w-44 -translate-x-1/2 rounded-t-3xl border border-red-900/60 bg-zinc-950" />
+              <div className="absolute inset-5 rounded-t-[1.65rem] border border-white/10 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.18),transparent_24%)]" />
+              <div className="absolute left-1/2 top-[-52px] h-20 w-52 -translate-x-1/2 rounded-t-3xl border border-red-900/70 bg-zinc-950 shadow-2xl shadow-black/40" />
+              <div className="absolute inset-x-0 bottom-0 h-3 bg-[#8E090B]/80 shadow-[0_0_35px_rgba(142,9,11,0.7)]" />
             </motion.div>
 
-            <div className="absolute inset-0 rounded-b-[2rem] border border-red-900/60 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black shadow-2xl shadow-black/60">
-              <div className="absolute inset-5 rounded-b-[1.4rem] border border-white/8 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%)]" />
-              <div className="absolute inset-x-0 top-0 h-px bg-red-800/80" />
-              <div className="absolute left-1/2 top-[-18px] h-12 w-24 -translate-x-1/2 rounded-xl border border-red-900/70 bg-[#8E090B] shadow-[0_0_44px_rgba(142,9,11,0.8)]" />
+            <div className="absolute inset-0 rounded-b-[2.25rem] border border-red-900/70 bg-gradient-to-br from-zinc-800 via-zinc-950 to-black shadow-2xl shadow-black/70 [transform:translateZ(42px)]">
+              <motion.div style={{ opacity: innerLightOpacity }} className="absolute inset-8 rounded-[1.4rem] bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.78),rgba(142,9,11,0.42)_34%,transparent_70%)] blur-sm" />
+              <div className="absolute inset-5 rounded-b-[1.65rem] border border-white/10 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%)]" />
+              <div className="absolute inset-x-0 top-0 h-px bg-red-700/90" />
+              <div className="absolute left-1/2 top-[-22px] h-14 w-28 -translate-x-1/2 rounded-xl border border-red-900/70 bg-[#8E090B] shadow-[0_0_48px_rgba(142,9,11,0.95)]" />
               <div className="absolute bottom-7 left-7 right-7 grid grid-cols-4 gap-3 opacity-70">
                 {Array.from({ length: 12 }, (_, index) => (
                   <div key={index} className="h-2 rounded-full bg-white/10" />
                 ))}
               </div>
             </div>
+
+            <div className="absolute inset-y-4 left-[-18px] w-8 rounded-l-2xl bg-gradient-to-b from-zinc-700 to-black [transform:rotateY(90deg)_translateZ(-4px)]" />
+            <div className="absolute inset-y-4 right-[-18px] w-8 rounded-r-2xl bg-gradient-to-b from-zinc-700 to-black [transform:rotateY(90deg)_translateZ(4px)]" />
           </motion.div>
 
           {supplies.map((supply) => (
             <MedicalSupply key={supply.label} {...supply} progress={scrollYProgress} />
           ))}
         </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 bg-gradient-to-t from-[#07090f] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-40 h-40 bg-gradient-to-b from-[#07090f] to-transparent" />
       </div>
     </section>
   );

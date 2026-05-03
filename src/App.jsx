@@ -120,6 +120,64 @@ function smoothScrollToSection(event, sectionId) {
   window.history.pushState(null, "", `#${sectionId}`);
 }
 
+function SmoothScrollController() {
+  React.useEffect(() => {
+    let target = window.scrollY;
+    let current = window.scrollY;
+    let rafId = null;
+    const ease = 0.075;
+
+    function maxScroll() {
+      return document.documentElement.scrollHeight - window.innerHeight;
+    }
+
+    function animate() {
+      current += (target - current) * ease;
+      if (Math.abs(target - current) < 0.35) current = target;
+      window.scrollTo(0, current);
+
+      if (current !== target) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        rafId = null;
+      }
+    }
+
+    function onWheel(event) {
+      event.preventDefault();
+      const multiplier = 0.82;
+      target = Math.max(0, Math.min(maxScroll(), target + event.deltaY * multiplier));
+      if (!rafId) rafId = requestAnimationFrame(animate);
+    }
+
+    function onKeyDown(event) {
+      const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
+      if (!keys.includes(event.key)) return;
+
+      event.preventDefault();
+      if (event.key === "ArrowDown") target += 180;
+      if (event.key === "ArrowUp") target -= 180;
+      if (event.key === "PageDown" || event.key === " ") target += window.innerHeight * 0.86;
+      if (event.key === "PageUp") target -= window.innerHeight * 0.86;
+      if (event.key === "Home") target = 0;
+      if (event.key === "End") target = maxScroll();
+      target = Math.max(0, Math.min(maxScroll(), target));
+      if (!rafId) rafId = requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  return null;
+}
+
 function CursorGlow() {
   const mouseX = useMotionValue(-200);
   const mouseY = useMotionValue(-200);
@@ -267,11 +325,11 @@ function BriefcaseScenePreview() {
 }
 
 function MedicalSupply({ label, type, style, x, y, rotate, progress }) {
-  const opacity = useTransform(progress, [0.24, 0.42], [0, 1]);
-  const supplyX = useTransform(progress, [0.28, 0.72], [0, x]);
-  const supplyY = useTransform(progress, [0.28, 0.72], [0, y]);
-  const supplyRotate = useTransform(progress, [0.28, 0.72], [0, rotate]);
-  const supplyScale = useTransform(progress, [0.28, 0.5, 0.9], [0.55, 1.08, 1]);
+  const opacity = useTransform(progress, [0.58, 0.72], [0, 1]);
+  const supplyX = useTransform(progress, [0.6, 0.86], [0, x]);
+  const supplyY = useTransform(progress, [0.6, 0.86], [0, y]);
+  const supplyRotate = useTransform(progress, [0.6, 0.86], [0, rotate]);
+  const supplyScale = useTransform(progress, [0.58, 0.74, 0.92], [0.45, 1.1, 1]);
 
   return (
     <motion.div
@@ -317,25 +375,25 @@ function ScrollBriefcaseExperience() {
   const targetRef = React.useRef(null);
   const { scrollYProgress } = useScroll({ target: targetRef, offset: ["start start", "end end"] });
 
-  const sceneScale = useTransform(scrollYProgress, [0, 0.14, 0.75, 1], [0.92, 1, 1.04, 0.92]);
-  const sceneOpacity = useTransform(scrollYProgress, [0, 0.06, 0.9, 1], [0, 1, 1, 0]);
+  const sceneScale = useTransform(scrollYProgress, [0, 0.1, 0.82, 1], [0.96, 1, 1.03, 0.92]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.04, 0.93, 1], [0, 1, 1, 0]);
   const sceneBlur = useTransform(scrollYProgress, [0, 0.08, 0.9, 1], ["blur(18px)", "blur(0px)", "blur(0px)", "blur(16px)"]);
 
-  const caseRotateY = useTransform(scrollYProgress, [0, 0.16, 0.33, 0.55, 1], [-32, 120, 360, 382, 396]);
-  const caseRotateX = useTransform(scrollYProgress, [0, 0.22, 0.45, 0.78, 1], [14, -11, -4, 6, 0]);
+  const caseRotateY = useTransform(scrollYProgress, [0, 0.2, 0.42, 0.68, 1], [-32, 90, 360, 382, 396]);
+  const caseRotateX = useTransform(scrollYProgress, [0, 0.24, 0.52, 0.84, 1], [14, -10, -4, 6, 0]);
   const caseRotateZ = useTransform(scrollYProgress, [0, 0.2, 0.46, 1], [-3, 2, 0, 0]);
-  const caseScale = useTransform(scrollYProgress, [0, 0.22, 0.52, 0.82, 1], [0.62, 1.08, 0.98, 0.82, 0.62]);
+  const caseScale = useTransform(scrollYProgress, [0, 0.24, 0.6, 0.86, 1], [0.78, 1.12, 1, 0.84, 0.66]);
   const caseY = useTransform(scrollYProgress, [0, 0.25, 0.7, 1], [150, 0, -40, -160]);
   const caseZ = useTransform(scrollYProgress, [0, 0.3, 0.62, 1], [0, 190, 80, -220]);
 
-  const lidRotate = useTransform(scrollYProgress, [0.34, 0.52, 0.72], [0, -126, -118]);
-  const lidZ = useTransform(scrollYProgress, [0.34, 0.58], [0, -60]);
-  const lidGlow = useTransform(scrollYProgress, [0.28, 0.5, 0.76], [0, 1, 0.35]);
-  const innerLightOpacity = useTransform(scrollYProgress, [0.32, 0.54, 0.86], [0, 0.95, 0.18]);
+  const lidRotate = useTransform(scrollYProgress, [0.46, 0.64, 0.82], [0, -126, -118]);
+  const lidZ = useTransform(scrollYProgress, [0.46, 0.68], [0, -60]);
+  const lidGlow = useTransform(scrollYProgress, [0.38, 0.64, 0.86], [0, 1, 0.35]);
+  const innerLightOpacity = useTransform(scrollYProgress, [0.44, 0.66, 0.9], [0, 0.95, 0.18]);
 
-  const introOpacity = useTransform(scrollYProgress, [0.02, 0.18, 0.34], [1, 1, 0]);
-  const unlockOpacity = useTransform(scrollYProgress, [0.75, 0.91], [0, 1]);
-  const nextSectionReveal = useTransform(scrollYProgress, [0.82, 1], [60, 0]);
+  const introOpacity = useTransform(scrollYProgress, [0.02, 0.22, 0.42], [1, 1, 0]);
+  const unlockOpacity = useTransform(scrollYProgress, [0.82, 0.94], [0, 1]);
+  const nextSectionReveal = useTransform(scrollYProgress, [0.86, 1], [80, 0]);
 
   const tunnelY = useTransform(scrollYProgress, [0, 1], [0, -260]);
   const tunnelScale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.35, 1.85]);
@@ -349,7 +407,7 @@ function ScrollBriefcaseExperience() {
   ];
 
   return (
-    <section id="briefcase" ref={targetRef} className="relative z-10 h-[560vh] bg-[#07090f]">
+    <section id="briefcase" ref={targetRef} className="relative z-10 h-[820vh] bg-[#07090f]">
       <div className="sticky top-0 h-screen overflow-hidden px-5 md:px-8">
         <motion.div style={{ opacity: sceneOpacity, scale: sceneScale, filter: sceneBlur }} className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_46%,rgba(142,9,11,0.34),transparent_32%),radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.1),transparent_20%),radial-gradient(circle_at_82%_20%,rgba(255,255,255,0.08),transparent_22%),linear-gradient(180deg,#07090f_0%,#101827_48%,#07090f_100%)]" />
@@ -597,6 +655,7 @@ export default function MethodOneSolutionsMockup() {
     <>
       <style>{fontStyles}</style>
       <main className="min-h-screen overflow-hidden bg-[#07090f] text-white" style={{ fontFamily: "KindSans, ui-sans-serif, system-ui, sans-serif" }}>
+        <SmoothScrollController />
         <CursorGlow />
         <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_20%_10%,rgba(142,9,11,0.18),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.08),transparent_28%),linear-gradient(180deg,#07090f_0%,#0b111d_42%,#07090f_100%)]" />
 

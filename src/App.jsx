@@ -218,6 +218,7 @@ function runSmokeTests() {
   const videoPathPass = HERO_VIDEO_MOV_SRC.length > 0 && !HERO_VIDEO_MOV_SRC.includes("/mnt/data");
   const videoFallbackPass = HERO_VIDEO_MP4_SRC.length > 0 && !HERO_VIDEO_MP4_SRC.includes("/mnt/data");
   const kindSansPass = fontStyles.includes("KindSans");
+  const formEndpointPass = FORM_ENDPOINT.includes("formspree.io");
   const heroTextPass = "No more headaches. No more delays. Reliable sourcing for high-demand medical supplies.".length > 0;
   const needsPass = requiredNeeds.every((item) => needs.includes(item));
   const statsPass = requiredStats.every((item) => stats.some((stat) => stat[0] === item));
@@ -238,6 +239,7 @@ function runSmokeTests() {
     videoPathPass &&
     videoFallbackPass &&
     kindSansPass &&
+    formEndpointPass &&
     heroTextPass
   );
 }
@@ -305,10 +307,23 @@ function CursorGlow() {
 }
 
 function HeroMotionBackground() {
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 38 }, (_, index) => ({
+        id: index,
+        size: 2 + (index % 5),
+        left: `${(index * 17) % 100}%`,
+        top: `${(index * 29) % 100}%`,
+        delay: (index % 9) * 0.22,
+        duration: 7 + (index % 6),
+      })),
+    []
+  );
+
   return (
     <div className="absolute inset-0 -z-10 overflow-hidden">
       <video
-        className="absolute inset-0 h-full w-full object-cover opacity-45"
+        className="absolute inset-0 h-full w-full scale-105 object-cover opacity-35 blur-[1px]"
         autoPlay
         muted
         loop
@@ -319,25 +334,52 @@ function HeroMotionBackground() {
         <source src={HERO_VIDEO_MOV_SRC} type="video/quicktime" />
       </video>
 
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(142,9,11,0.24),transparent_26%),radial-gradient(circle_at_74%_28%,rgba(255,255,255,0.08),transparent_22%),linear-gradient(180deg,rgba(7,9,15,0.72)_0%,rgba(7,9,15,0.82)_48%,#07090f_100%)]" />
+
       <motion.div
         aria-hidden="true"
-        animate={{ scale: [1, 1.08, 1], rotate: [0, 1.5, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -left-32 -top-24 h-[520px] w-[520px] rounded-full bg-red-950/40 blur-3xl"
+        animate={{ scale: [1, 1.1, 1], rotate: [0, 6, 0] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-[-10%] top-[8%] h-[520px] w-[520px] rounded-full border border-[#8E090B]/20 bg-[#8E090B]/10 blur-2xl"
       />
       <motion.div
         aria-hidden="true"
-        animate={{ x: [0, -80, 0], y: [0, 45, 0] }}
+        animate={{ x: [0, -90, 0], y: [0, 58, 0], scale: [1, 0.92, 1] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute right-[-140px] top-20 h-[620px] w-[620px] rounded-full bg-white/10 blur-3xl"
+        className="absolute right-[-160px] top-[14%] h-[620px] w-[620px] rounded-full bg-white/10 blur-3xl"
       />
+
       <motion.div
         aria-hidden="true"
         animate={{ backgroundPosition: ["0px 0px", "120px 80px"] }}
         transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:80px_80px]"
+        className="absolute inset-0 opacity-[0.09] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:80px_80px]"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07090f]/80 via-[#07090f]/70 to-[#07090f]" />
+
+      <div className="absolute inset-0 overflow-hidden">
+        {particles.map((particle) => (
+          <motion.span
+            key={particle.id}
+            aria-hidden="true"
+            className="absolute rounded-full bg-white/40 shadow-[0_0_18px_rgba(255,255,255,0.35)]"
+            style={{
+              width: particle.size,
+              height: particle.size,
+              left: particle.left,
+              top: particle.top,
+            }}
+            animate={{
+              y: [0, -42, 0],
+              x: [0, particle.id % 2 === 0 ? 28 : -28, 0],
+              opacity: [0.08, 0.55, 0.08],
+              scale: [1, 1.8, 1],
+            }}
+            transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay, ease: "easeInOut" }}
+          />
+        ))}
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#07090f]/20 to-[#07090f]" />
     </div>
   );
 }
@@ -372,15 +414,21 @@ function FloatingCard({ icon: Icon, title, text }) {
   return (
     <motion.div
       variants={fadeUp}
-      whileHover={{ y: -8, scale: 1.015 }}
+      whileHover={{ y: -10, scale: 1.025, rotateX: 3, rotateY: -3 }}
       transition={{ type: "spring", stiffness: 220, damping: 22 }}
-      className="rounded-3xl border border-red-950/60 bg-red-950/10 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl"
+      className="group relative overflow-hidden rounded-3xl border border-red-950/60 bg-red-950/10 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl [transform-style:preserve-3d]"
     >
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8E090B] text-white shadow-lg shadow-black/20">
+      <motion.div
+        aria-hidden="true"
+        className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-[#8E090B]/25 blur-3xl"
+        animate={{ x: [0, -18, 0], y: [0, 22, 0], scale: [1, 1.18, 1] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8E090B] text-white shadow-lg shadow-black/20 transition duration-500 group-hover:rotate-6 group-hover:scale-110">
         <Icon className="h-5 w-5" />
       </div>
-      <h3 className="text-lg font-semibold tracking-tight text-white">{title}</h3>
-      <p className="mt-3 text-sm leading-6 text-red-100/70">{text}</p>
+      <h3 className="relative text-lg font-semibold tracking-tight text-white">{title}</h3>
+      <p className="relative mt-3 text-sm leading-6 text-red-100/70">{text}</p>
     </motion.div>
   );
 }
@@ -416,10 +464,220 @@ function ProcessLine() {
 
 function Stat({ value, label }) {
   return (
-    <motion.div variants={fadeUp} className="rounded-3xl border border-red-950/60 bg-red-950/10 p-5 backdrop-blur-xl">
+    <motion.div variants={fadeUp} whileHover={{ y: -6 }} className="relative overflow-hidden rounded-3xl border border-red-950/60 bg-red-950/10 p-5 backdrop-blur-xl">
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent"
+        animate={{ x: ["-100%", "100%"] }}
+        transition={{ duration: 3.8, repeat: Infinity, ease: "linear" }}
+      />
       <div className="text-3xl font-semibold tracking-tight text-white">{value}</div>
       <div className="mt-2 text-sm leading-5 text-red-100/50">{label}</div>
     </motion.div>
+  );
+}
+
+function KineticStrip() {
+  const items = ["Verified Stock", "Urgent RFQs", "No Backorder Stories", "Emergency Fulfillment", "Institutional Supply"];
+
+  return (
+    <section className="relative z-10 overflow-hidden border-y border-red-950/60 bg-[#8E090B]/10 py-6 backdrop-blur-xl">
+      <motion.div
+        className="flex whitespace-nowrap text-sm font-semibold uppercase tracking-[0.38em] text-red-100/55"
+        animate={{ x: [0, -900] }}
+        transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
+      >
+        {[...items, ...items, ...items, ...items].map((item, index) => (
+          <span key={`${item}-${index}`} className="mx-8 inline-flex items-center gap-8">
+            {item}
+            <span className="h-2 w-2 rounded-full bg-[#8E090B] shadow-[0_0_20px_rgba(142,9,11,0.9)]" />
+          </span>
+        ))}
+      </motion.div>
+    </section>
+  );
+}
+
+function PinnedSupplyScene() {
+  const cards = [
+    ["01", "Find", "Exact SKU, substitute logic, expiration requirements, and shipping constraints get clarified first."],
+    ["02", "Verify", "Inventory gets checked before the quote becomes a promise."],
+    ["03", "Move", "The order gets routed through the fastest reliable fulfillment path."],
+  ];
+
+  return (
+    <section className="relative z-10 px-5 py-24 md:px-8 md:py-32">
+      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-120px" }} variants={stagger} className="lg:sticky lg:top-28 lg:self-start">
+          <motion.div variants={fadeUp} className="mb-5 text-sm font-semibold uppercase tracking-[0.28em] text-[#8E090B]">Supply Intelligence</motion.div>
+          <motion.h2 variants={fadeUp} className="text-4xl font-semibold tracking-[-0.045em] md:text-6xl">A request should feel like it is already moving.</motion.h2>
+          <motion.p variants={fadeUp} className="mt-6 max-w-xl text-lg leading-8 text-red-100/70">This section adds the cinematic layer: cards move, light shifts, and the procurement process feels active instead of static.</motion.p>
+        </motion.div>
+
+        <div className="space-y-6">
+          {cards.map(([number, title, text], index) => (
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 70, rotateX: 14, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.85, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className="relative min-h-[260px] overflow-hidden rounded-[2.25rem] border border-red-950/60 bg-slate-950/70 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl"
+            >
+              <motion.div
+                aria-hidden="true"
+                className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#8E090B]/30 blur-3xl"
+                animate={{ scale: [1, 1.2, 1], x: [0, -28, 0], y: [0, 24, 0] }}
+                transition={{ duration: 8 + index, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                aria-hidden="true"
+                className="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "linear", delay: index * 0.6 }}
+              />
+              <div className="relative text-sm font-semibold uppercase tracking-[0.35em] text-[#8E090B]">{number}</div>
+              <div className="relative mt-7 text-5xl font-semibold tracking-[-0.06em] text-white md:text-7xl">{title}</div>
+              <p className="relative mt-5 max-w-xl text-base leading-7 text-red-100/70">{text}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RequestForm({ smokeTestsPass }) {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    suppliesNeeded: "",
+    quantityNeeded: "",
+  });
+  const [status, setStatus] = useState("idle");
+  const [message, setMessage] = useState("");
+
+  function updateField(event) {
+    const { name, value } = event.target;
+    setFormData((current) => ({ ...current, [name]: value }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const requiredFields = [
+      formData.firstName,
+      formData.lastName,
+      formData.email,
+      formData.phone,
+      formData.suppliesNeeded,
+      formData.quantityNeeded,
+    ];
+
+    if (requiredFields.some((field) => !field.trim())) {
+      setStatus("error");
+      setMessage("Please complete every required field before submitting.");
+      return;
+    }
+
+    if (FORM_ENDPOINT.includes("YOUR_FORM_ID")) {
+      setStatus("error");
+      setMessage("Form backend not connected yet. Replace YOUR_FORM_ID with your real Formspree form ID.");
+      return;
+    }
+
+    setStatus("submitting");
+    setMessage("Sending request...");
+
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          subject: "New Method One Solutions Urgent Request",
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          suppliesNeeded: formData.suppliesNeeded,
+          quantityNeeded: formData.quantityNeeded,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      setStatus("success");
+      setMessage("Request sent. We will review the details and follow up shortly.");
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        suppliesNeeded: "",
+        quantityNeeded: "",
+      });
+    } catch (error) {
+      setStatus("error");
+      setMessage("Something went wrong. Please email service@methodonesolutions.com directly or try again.");
+    }
+  }
+
+  const inputClass = "w-full rounded-2xl border border-red-950/60 bg-black/25 px-4 py-4 text-sm text-white placeholder:text-red-100/35 outline-none transition focus:border-[#8E090B] focus:bg-black/35";
+  const labelClass = "text-sm font-semibold text-white";
+  const hintClass = "mt-2 text-xs leading-5 text-red-100/55";
+
+  return (
+    <form onSubmit={handleSubmit} className="rounded-3xl border border-red-950/60 bg-red-950/10 p-5 backdrop-blur-xl">
+      <div className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8E090B]">Submit an Urgent Request</div>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelClass}>First Name <span className="text-red-100/50">(required)</span></label>
+          <input className={`${inputClass} mt-2`} name="firstName" value={formData.firstName} onChange={updateField} autoComplete="given-name" />
+        </div>
+        <div>
+          <label className={labelClass}>Last Name <span className="text-red-100/50">(required)</span></label>
+          <input className={`${inputClass} mt-2`} name="lastName" value={formData.lastName} onChange={updateField} autoComplete="family-name" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClass}>Email <span className="text-red-100/50">(required)</span></label>
+          <input className={`${inputClass} mt-2`} name="email" value={formData.email} onChange={updateField} type="email" autoComplete="email" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClass}>Phone <span className="text-red-100/50">(required)</span></label>
+          <input className={`${inputClass} mt-2`} name="phone" value={formData.phone} onChange={updateField} type="tel" autoComplete="tel" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClass}>Supplies Needed <span className="text-red-100/50">(required)</span></label>
+          <p className={hintClass}>Please include all part numbers and other identifying information for all supplies needed. We got you.</p>
+          <textarea className={`${inputClass} mt-3 min-h-28 resize-none`} name="suppliesNeeded" value={formData.suppliesNeeded} onChange={updateField} />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClass}>Quantity Needed <span className="text-red-100/50">(required)</span></label>
+          <p className={hintClass}>Example: BD #367342, 10 cases. Ethicon #636H, 20 boxes. Zimmer #60707015500, 5 eaches.</p>
+          <textarea className={`${inputClass} mt-3 min-h-28 resize-none`} name="quantityNeeded" value={formData.quantityNeeded} onChange={updateField} />
+        </div>
+      </div>
+
+      <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#8E090B] px-6 py-4 text-sm font-semibold text-white transition hover:bg-red-900 disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={status === "submitting"}>
+        {status === "submitting" ? "Sending..." : "Submit Request"} <ArrowRight className="h-4 w-4" />
+      </button>
+
+      {message && (
+        <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${status === "success" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-100" : "border-red-500/30 bg-red-500/10 text-red-100"}`}>
+          {message}
+        </div>
+      )}
+
+      <div className="mt-4 text-xs text-white/35">Internal smoke test: {smokeTestsPass ? "passed" : "failed"}</div>
+    </form>
   );
 }
 
@@ -557,6 +815,8 @@ export default function MethodOneSolutionsMockup() {
           </motion.div>
         </section>
 
+        <KineticStrip />
+
         <section className="relative z-10 border-y border-red-950/60 bg-red-950/10 px-5 py-8 backdrop-blur-xl md:px-8">
           <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-4">
             {stats.map(([value, label]) => (
@@ -579,6 +839,8 @@ export default function MethodOneSolutionsMockup() {
             </motion.div>
           </div>
         </section>
+
+        <PinnedSupplyScene />
 
         <section id="process" className="relative z-10 px-5 py-24 md:px-8 md:py-32">
           <div className="mx-auto max-w-7xl rounded-[2.5rem] border border-red-950/60 bg-red-950/10 p-6 backdrop-blur-xl md:p-10">
@@ -629,34 +891,26 @@ export default function MethodOneSolutionsMockup() {
               </div>
 
               <div className="bg-slate-950 p-8 text-white md:p-12">
-                <div className="rounded-3xl border border-red-950/60 bg-red-950/10 p-5 backdrop-blur-xl">
-                  <label className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8E090B]">Product or SKU</label>
-                  <div className="mt-3 flex items-center gap-3 rounded-2xl border border-red-950/60 bg-black/25 px-4 py-4 text-red-100/50">
-                    <Search className="h-5 w-5" />
-                    <span>Example: surgical kit, catheter, PPE case pack...</span>
-                  </div>
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    {["Exact SKU", "Quantity", "Need-by date", "Shipping location"].map((item) => (
-                      <div key={item} className="rounded-2xl border border-red-950/60 bg-red-950/10 px-4 py-4 text-sm text-red-100/70">{item}</div>
-                    ))}
-                  </div>
-                  <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#8E090B] px-6 py-4 text-sm font-semibold text-white transition hover:bg-red-900" type="button">
-                    Submit Request <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <div className="mt-4 text-xs text-white/35">Internal smoke test: {smokeTestsPass ? "passed" : "failed"}</div>
-                </div>
+                <RequestForm smokeTestsPass={smokeTestsPass} />
               </div>
             </div>
           </div>
         </section>
 
-        <footer className="relative z-10 border-t border-red-950/60 px-5 pb-12 pt-16 md:px-8">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-5 text-center">
-            <MethodLogo className="h-16 md:h-20" />
-            <div className="text-xs uppercase tracking-[0.28em] text-[#8E090B]">Verified stock. Fast fulfillment. Clean execution.</div>
-          </div>
-        </footer>
-      </main>
-    </>
-  );
-}
+       <footer className="relative z-10 border-t border-red-950/60 px-5 pb-12 pt-16 md:px-8">
+  <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-5 text-center">
+    
+    <MethodLogo className="h-16 md:h-20" />
+
+    <div className="text-xs uppercase tracking-[0.28em] text-[#8E090B]">
+      Verified stock. Fast fulfillment. Clean execution.
+    </div>
+
+    <div className="mt-4 text-sm text-white/70">
+      <div>Phone: (877) 321-9876</div>
+      <div>Email: service@methodonesolutions.com</div>
+      <div>Hours: Mon–Fri 4am–6pm PST</div>
+    </div>
+
+  </div>
+</footer>

@@ -120,64 +120,6 @@ function smoothScrollToSection(event, sectionId) {
   window.history.pushState(null, "", `#${sectionId}`);
 }
 
-function SmoothScrollController() {
-  React.useEffect(() => {
-    let target = window.scrollY;
-    let current = window.scrollY;
-    let rafId = null;
-    const ease = 0.075;
-
-    function maxScroll() {
-      return document.documentElement.scrollHeight - window.innerHeight;
-    }
-
-    function animate() {
-      current += (target - current) * ease;
-      if (Math.abs(target - current) < 0.35) current = target;
-      window.scrollTo(0, current);
-
-      if (current !== target) {
-        rafId = requestAnimationFrame(animate);
-      } else {
-        rafId = null;
-      }
-    }
-
-    function onWheel(event) {
-      event.preventDefault();
-      const multiplier = 0.82;
-      target = Math.max(0, Math.min(maxScroll(), target + event.deltaY * multiplier));
-      if (!rafId) rafId = requestAnimationFrame(animate);
-    }
-
-    function onKeyDown(event) {
-      const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
-      if (!keys.includes(event.key)) return;
-
-      event.preventDefault();
-      if (event.key === "ArrowDown") target += 180;
-      if (event.key === "ArrowUp") target -= 180;
-      if (event.key === "PageDown" || event.key === " ") target += window.innerHeight * 0.86;
-      if (event.key === "PageUp") target -= window.innerHeight * 0.86;
-      if (event.key === "Home") target = 0;
-      if (event.key === "End") target = maxScroll();
-      target = Math.max(0, Math.min(maxScroll(), target));
-      if (!rafId) rafId = requestAnimationFrame(animate);
-    }
-
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("keydown", onKeyDown, { passive: false });
-
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("keydown", onKeyDown);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
-
-  return null;
-}
-
 function CursorGlow() {
   const mouseX = useMotionValue(-200);
   const mouseY = useMotionValue(-200);
@@ -372,32 +314,128 @@ function MedicalSupply({ label, type, style, x, y, rotate, progress }) {
 }
 
 function ScrollBriefcaseExperience() {
-  const targetRef = React.useRef(null);
-  const { scrollYProgress } = useScroll({ target: targetRef, offset: ["start start", "end end"] });
+  const sectionRef = React.useRef(null);
+  const progress = useMotionValue(0);
+  const smoothProgress = useSpring(progress, { stiffness: 120, damping: 26, mass: 0.55 });
+  const lockState = React.useRef({ active: false, locked: false, progress: 0, releaseDirection: null });
+  const [, forceRender] = useState(0);
 
-  const sceneScale = useTransform(scrollYProgress, [0, 0.1, 0.82, 1], [0.96, 1, 1.03, 0.92]);
-  const sceneOpacity = useTransform(scrollYProgress, [0, 0.04, 0.93, 1], [0, 1, 1, 0]);
-  const sceneBlur = useTransform(scrollYProgress, [0, 0.08, 0.9, 1], ["blur(18px)", "blur(0px)", "blur(0px)", "blur(16px)"]);
+  React.useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
 
-  const caseRotateY = useTransform(scrollYProgress, [0, 0.2, 0.42, 0.68, 1], [-32, 90, 360, 382, 396]);
-  const caseRotateX = useTransform(scrollYProgress, [0, 0.24, 0.52, 0.84, 1], [14, -10, -4, 6, 0]);
-  const caseRotateZ = useTransform(scrollYProgress, [0, 0.2, 0.46, 1], [-3, 2, 0, 0]);
-  const caseScale = useTransform(scrollYProgress, [0, 0.24, 0.6, 0.86, 1], [0.78, 1.12, 1, 0.84, 0.66]);
-  const caseY = useTransform(scrollYProgress, [0, 0.25, 0.7, 1], [150, 0, -40, -160]);
-  const caseZ = useTransform(scrollYProgress, [0, 0.3, 0.62, 1], [0, 190, 80, -220]);
+    function isSectionCentered() {
+      const rect = section.getBoundingClientRect();
+      const midpoint = window.innerHeight * 0.5;
+      return rect.top <= midpoint && rect.bottom >= midpoint;
+    }
 
-  const lidRotate = useTransform(scrollYProgress, [0.46, 0.64, 0.82], [0, -126, -118]);
-  const lidZ = useTransform(scrollYProgress, [0.46, 0.68], [0, -60]);
-  const lidGlow = useTransform(scrollYProgress, [0.38, 0.64, 0.86], [0, 1, 0.35]);
-  const innerLightOpacity = useTransform(scrollYProgress, [0.44, 0.66, 0.9], [0, 0.95, 0.18]);
+    function lockBody() {
+      if (lockState.current.locked) return;
+      lockState.current.locked = true;
+      document.body.style.overflow = "hidden";
+      forceRender((value) => value + 1);
+    }
 
-  const introOpacity = useTransform(scrollYProgress, [0.02, 0.22, 0.42], [1, 1, 0]);
-  const unlockOpacity = useTransform(scrollYProgress, [0.82, 0.94], [0, 1]);
-  const nextSectionReveal = useTransform(scrollYProgress, [0.86, 1], [80, 0]);
+    function unlockBody(direction) {
+      if (!lockState.current.locked) return;
+      lockState.current.locked = false;
+      lockState.current.releaseDirection = direction;
+      document.body.style.overflow = "";
+      forceRender((value) => value + 1);
+    }
 
-  const tunnelY = useTransform(scrollYProgress, [0, 1], [0, -260]);
-  const tunnelScale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.35, 1.85]);
-  const gridOpacity = useTransform(scrollYProgress, [0, 0.36, 0.8, 1], [0.08, 0.22, 0.12, 0]);
+    function onScroll() {
+      if (lockState.current.locked) return;
+      if (!isSectionCentered()) return;
+
+      if (lockState.current.releaseDirection === "down" && lockState.current.progress >= 1) return;
+      if (lockState.current.releaseDirection === "up" && lockState.current.progress <= 0) return;
+
+      const rect = section.getBoundingClientRect();
+      const targetTop = window.scrollY + rect.top;
+      window.scrollTo({ top: targetTop, behavior: "auto" });
+      lockBody();
+    }
+
+    function onWheel(event) {
+      if (!lockState.current.locked) return;
+      event.preventDefault();
+
+      const delta = event.deltaY / 1800;
+      const next = Math.max(0, Math.min(1, lockState.current.progress + delta));
+      lockState.current.progress = next;
+      progress.set(next);
+
+      if (next >= 1 && event.deltaY > 0) {
+        unlockBody("down");
+        window.scrollBy({ top: window.innerHeight * 0.72, behavior: "smooth" });
+      }
+
+      if (next <= 0 && event.deltaY < 0) {
+        unlockBody("up");
+        window.scrollBy({ top: -window.innerHeight * 0.72, behavior: "smooth" });
+      }
+    }
+
+    function onKeyDown(event) {
+      if (!lockState.current.locked) return;
+      const downKeys = ["ArrowDown", "PageDown", " "];
+      const upKeys = ["ArrowUp", "PageUp"];
+      if (![...downKeys, ...upKeys].includes(event.key)) return;
+      event.preventDefault();
+
+      const delta = downKeys.includes(event.key) ? 0.08 : -0.08;
+      const next = Math.max(0, Math.min(1, lockState.current.progress + delta));
+      lockState.current.progress = next;
+      progress.set(next);
+
+      if (next >= 1 && delta > 0) {
+        unlockBody("down");
+        window.scrollBy({ top: window.innerHeight * 0.72, behavior: "smooth" });
+      }
+
+      if (next <= 0 && delta < 0) {
+        unlockBody("up");
+        window.scrollBy({ top: -window.innerHeight * 0.72, behavior: "smooth" });
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown, { passive: false });
+    onScroll();
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [progress]);
+
+  const sceneScale = useTransform(smoothProgress, [0, 0.1, 0.82, 1], [0.96, 1, 1.03, 0.92]);
+  const sceneOpacity = useTransform(smoothProgress, [0, 0.04, 0.93, 1], [0, 1, 1, 0.88]);
+  const sceneBlur = useTransform(smoothProgress, [0, 0.08, 0.9, 1], ["blur(18px)", "blur(0px)", "blur(0px)", "blur(8px)"]);
+
+  const caseRotateY = useTransform(smoothProgress, [0, 0.2, 0.42, 0.68, 1], [-32, 90, 360, 382, 396]);
+  const caseRotateX = useTransform(smoothProgress, [0, 0.24, 0.52, 0.84, 1], [14, -10, -4, 6, 0]);
+  const caseRotateZ = useTransform(smoothProgress, [0, 0.2, 0.46, 1], [-3, 2, 0, 0]);
+  const caseScale = useTransform(smoothProgress, [0, 0.24, 0.6, 0.86, 1], [0.78, 1.12, 1, 0.84, 0.66]);
+  const caseY = useTransform(smoothProgress, [0, 0.25, 0.7, 1], [150, 0, -40, -160]);
+  const caseZ = useTransform(smoothProgress, [0, 0.3, 0.62, 1], [0, 190, 80, -220]);
+
+  const lidRotate = useTransform(smoothProgress, [0.46, 0.64, 0.82], [0, -126, -118]);
+  const lidZ = useTransform(smoothProgress, [0.46, 0.68], [0, -60]);
+  const lidGlow = useTransform(smoothProgress, [0.38, 0.64, 0.86], [0, 1, 0.35]);
+  const innerLightOpacity = useTransform(smoothProgress, [0.44, 0.66, 0.9], [0, 0.95, 0.18]);
+
+  const introOpacity = useTransform(smoothProgress, [0.02, 0.22, 0.42], [1, 1, 0]);
+  const unlockOpacity = useTransform(smoothProgress, [0.82, 0.94], [0, 1]);
+  const nextSectionReveal = useTransform(smoothProgress, [0.86, 1], [80, 0]);
+  const tunnelY = useTransform(smoothProgress, [0, 1], [0, -260]);
+  const tunnelScale = useTransform(smoothProgress, [0, 0.5, 1], [1, 1.35, 1.85]);
+  const gridOpacity = useTransform(smoothProgress, [0, 0.36, 0.8, 1], [0.08, 0.22, 0.12, 0]);
 
   const supplies = [
     { label: "Surgical", type: "box", x: -390, y: -190, rotate: -20, z: 160 },
@@ -407,91 +445,50 @@ function ScrollBriefcaseExperience() {
   ];
 
   return (
-    <section id="briefcase" ref={targetRef} className="relative z-10 h-[820vh] bg-[#07090f]">
-      <div className="sticky top-0 h-screen overflow-hidden px-5 md:px-8">
+    <section id="briefcase" ref={sectionRef} className="relative z-10 h-screen bg-[#07090f]">
+      <div className="relative h-screen overflow-hidden px-5 md:px-8">
         <motion.div style={{ opacity: sceneOpacity, scale: sceneScale, filter: sceneBlur }} className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_46%,rgba(142,9,11,0.34),transparent_32%),radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.1),transparent_20%),radial-gradient(circle_at_82%_20%,rgba(255,255,255,0.08),transparent_22%),linear-gradient(180deg,#07090f_0%,#101827_48%,#07090f_100%)]" />
-
-          <motion.div
-            aria-hidden="true"
-            style={{ y: tunnelY, scale: tunnelScale, opacity: gridOpacity }}
-            className="absolute inset-[-20%] [background-image:linear-gradient(to_right,rgba(255,255,255,0.26)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:90px_90px] [transform:rotateX(64deg)_translateY(220px)]"
-          />
-
-          <motion.div
-            aria-hidden="true"
-            style={{ opacity: lidGlow }}
-            className="absolute left-1/2 top-1/2 h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8E090B] blur-[130px]"
-          />
-
-          <motion.div
-            aria-hidden="true"
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
-            className="absolute left-1/2 top-1/2 h-[820px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-red-950/40"
-          />
-          <motion.div
-            aria-hidden="true"
-            animate={{ rotate: [360, 0] }}
-            transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
-            className="absolute left-1/2 top-1/2 h-[540px] w-[540px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
-          />
+          <motion.div aria-hidden="true" style={{ y: tunnelY, scale: tunnelScale, opacity: gridOpacity }} className="absolute inset-[-20%] [background-image:linear-gradient(to_right,rgba(255,255,255,0.26)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:90px_90px] [transform:rotateX(64deg)_translateY(220px)]" />
+          <motion.div aria-hidden="true" style={{ opacity: lidGlow }} className="absolute left-1/2 top-1/2 h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8E090B] blur-[130px]" />
+          <motion.div aria-hidden="true" animate={{ rotate: [0, 360] }} transition={{ duration: 34, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[820px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-red-950/40" />
+          <motion.div aria-hidden="true" animate={{ rotate: [360, 0] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[540px] w-[540px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
         </motion.div>
 
         <motion.div style={{ opacity: introOpacity }} className="absolute left-5 top-28 z-30 max-w-md md:left-12">
-          <div className="text-sm font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Pinned Fulfillment Sequence</div>
+          <div className="text-sm font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Locked Fulfillment Sequence</div>
           <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] text-white md:text-6xl">The request enters the case.</h2>
-          <p className="mt-5 text-base leading-7 text-red-100/65">Scroll slowly. The page stays locked while the briefcase spins, opens, and releases the supply categories.</p>
+          <p className="mt-5 text-base leading-7 text-red-100/65">Your scroll is captured here. Wheel movement advances the briefcase instead of moving the page.</p>
         </motion.div>
 
         <motion.div style={{ opacity: unlockOpacity, y: nextSectionReveal }} className="absolute bottom-12 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-5 text-center">
           <div className="rounded-[2rem] border border-red-950/60 bg-black/45 p-6 shadow-2xl shadow-black/40 backdrop-blur-2xl">
             <div className="text-xs font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Sequence Complete</div>
             <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white md:text-5xl">Supplies are sorted. The workflow is unlocked.</h3>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-red-100/60">The page releases after the animation because the pinned section ends here.</p>
           </div>
         </motion.div>
 
         <div className="absolute inset-0 z-20 flex items-center justify-center [perspective:2200px]">
-          <motion.div
-            style={{
-              rotateY: caseRotateY,
-              rotateX: caseRotateX,
-              rotateZ: caseRotateZ,
-              scale: caseScale,
-              y: caseY,
-              z: caseZ,
-            }}
-            className="relative h-[290px] w-[480px] [transform-style:preserve-3d]"
-          >
-            <motion.div
-              style={{ rotateX: lidRotate, z: lidZ, transformOrigin: "50% 100%" }}
-              className="absolute left-0 top-[-158px] h-[176px] w-full rounded-t-[2.25rem] border border-red-900/70 bg-gradient-to-br from-zinc-700 via-zinc-950 to-black shadow-2xl shadow-black/50 [transform-style:preserve-3d]"
-            >
+          <motion.div style={{ rotateY: caseRotateY, rotateX: caseRotateX, rotateZ: caseRotateZ, scale: caseScale, y: caseY, z: caseZ }} className="relative h-[290px] w-[480px] [transform-style:preserve-3d]">
+            <motion.div style={{ rotateX: lidRotate, z: lidZ, transformOrigin: "50% 100%" }} className="absolute left-0 top-[-158px] h-[176px] w-full rounded-t-[2.25rem] border border-red-900/70 bg-gradient-to-br from-zinc-700 via-zinc-950 to-black shadow-2xl shadow-black/50 [transform-style:preserve-3d]">
               <div className="absolute inset-5 rounded-t-[1.65rem] border border-white/10 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.18),transparent_24%)]" />
               <div className="absolute left-1/2 top-[-52px] h-20 w-52 -translate-x-1/2 rounded-t-3xl border border-red-900/70 bg-zinc-950 shadow-2xl shadow-black/40" />
               <div className="absolute inset-x-0 bottom-0 h-3 bg-[#8E090B]/80 shadow-[0_0_35px_rgba(142,9,11,0.7)]" />
             </motion.div>
-
             <div className="absolute inset-0 rounded-b-[2.25rem] border border-red-900/70 bg-gradient-to-br from-zinc-800 via-zinc-950 to-black shadow-2xl shadow-black/70 [transform:translateZ(42px)]">
               <motion.div style={{ opacity: innerLightOpacity }} className="absolute inset-8 rounded-[1.4rem] bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.78),rgba(142,9,11,0.42)_34%,transparent_70%)] blur-sm" />
               <div className="absolute inset-5 rounded-b-[1.65rem] border border-white/10 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%)]" />
               <div className="absolute inset-x-0 top-0 h-px bg-red-700/90" />
               <div className="absolute left-1/2 top-[-22px] h-14 w-28 -translate-x-1/2 rounded-xl border border-red-900/70 bg-[#8E090B] shadow-[0_0_48px_rgba(142,9,11,0.95)]" />
               <div className="absolute bottom-7 left-7 right-7 grid grid-cols-4 gap-3 opacity-70">
-                {Array.from({ length: 12 }, (_, index) => (
-                  <div key={index} className="h-2 rounded-full bg-white/10" />
-                ))}
+                {Array.from({ length: 12 }, (_, index) => <div key={index} className="h-2 rounded-full bg-white/10" />)}
               </div>
             </div>
-
             <div className="absolute inset-y-4 left-[-18px] w-8 rounded-l-2xl bg-gradient-to-b from-zinc-700 to-black [transform:rotateY(90deg)_translateZ(-4px)]" />
             <div className="absolute inset-y-4 right-[-18px] w-8 rounded-r-2xl bg-gradient-to-b from-zinc-700 to-black [transform:rotateY(90deg)_translateZ(4px)]" />
           </motion.div>
 
-          {supplies.map((supply) => (
-            <MedicalSupply key={supply.label} {...supply} progress={scrollYProgress} />
-          ))}
+          {supplies.map((supply) => <MedicalSupply key={supply.label} {...supply} progress={smoothProgress} />)}
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-40 bg-gradient-to-t from-[#07090f] to-transparent" />
@@ -655,7 +652,6 @@ export default function MethodOneSolutionsMockup() {
     <>
       <style>{fontStyles}</style>
       <main className="min-h-screen overflow-hidden bg-[#07090f] text-white" style={{ fontFamily: "KindSans, ui-sans-serif, system-ui, sans-serif" }}>
-        <SmoothScrollController />
         <CursorGlow />
         <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_20%_10%,rgba(142,9,11,0.18),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.08),transparent_28%),linear-gradient(180deg,#07090f_0%,#0b111d_42%,#07090f_100%)]" />
 

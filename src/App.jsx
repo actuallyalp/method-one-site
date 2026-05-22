@@ -498,6 +498,130 @@ function ScrollBriefcaseExperience() {
   );
 }
 
+function DepartmentSeal({ code }) {
+  return (
+    <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-red-900/60 bg-gradient-to-br from-zinc-100 via-zinc-300 to-zinc-500 shadow-2xl shadow-black/30">
+      <div className="absolute inset-2 rounded-full border border-[#8E090B]/50" />
+      <div className="absolute inset-4 rounded-full bg-[#07090f]" />
+      <div className="relative text-center text-xs font-black uppercase tracking-[0.18em] text-white">{code}</div>
+    </div>
+  );
+}
+
+function PastPerformanceSection() {
+  const sectionRef = React.useRef(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], [80, -120]);
+  const gridX = useTransform(scrollYProgress, [0, 1], [0, -120]);
+
+  const departments = [
+    {
+      code: "VA",
+      name: "Department of Veteran Affairs",
+      value: "$3,500,000",
+      sold: "High-demand medical expendables",
+      detail: "Time-critical overnight delivery for facility-wide use across departments.",
+    },
+    {
+      code: "USAF",
+      name: "Department of United States Air Force",
+      value: "$2,900,000",
+      sold: "Medical, dental, and lab supplies",
+      detail: "Hard-to-source supply support for medical logistics.",
+    },
+    {
+      code: "NAVY",
+      name: "Department of Navy",
+      value: "$2,750,000",
+      sold: "Medical, dental, lab supplies, and PPE",
+      detail: "Time-sensitive logistics support for naval mission continuity.",
+    },
+    {
+      code: "ARMY",
+      name: "Department of Army",
+      value: "$2,700,000",
+      sold: "Medical, dental, laboratory items, and PPE",
+      detail: "Mission-critical supply support for S4 readiness objectives.",
+    },
+    {
+      code: "IHS",
+      name: "Department of Indian Health Services",
+      value: "$2,600,000",
+      sold: "Medical, dental, laboratory supplies, and PPE",
+      detail: "Expedited delivery for IHS healthcare facilities.",
+    },
+    {
+      code: "DHS",
+      name: "Department of Homeland Security",
+      value: "$2,300,000",
+      sold: "Inks, toners, office supplies, electronics, and PPE",
+      detail: "Priority sustainment delivery supporting DHS operations.",
+    },
+  ];
+
+  return (
+    <section ref={sectionRef} className="relative z-10 overflow-hidden px-5 py-24 md:px-8 md:py-32">
+      <motion.div style={{ y: bgY }} className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(142,9,11,0.26),transparent_34%),linear-gradient(180deg,#07090f_0%,#111827_48%,#07090f_100%)]" />
+      <motion.div
+        style={{ x: gridX }}
+        className="absolute inset-0 -z-10 opacity-[0.08] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:90px_90px]"
+      />
+
+      <div className="mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 34, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-120px" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-14 max-w-4xl"
+        >
+          <div className="text-sm font-semibold uppercase tracking-[0.32em] text-[#8E090B]">Past Performance</div>
+          <h2 className="mt-5 text-4xl font-semibold tracking-[-0.055em] text-white md:text-6xl">Built for federal buyers who need proof, not decoration.</h2>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-red-100/65">As you scroll, each agency card locks into place with the value, what was supplied, and the mission detail behind the work.</p>
+        </motion.div>
+
+        <div className="grid gap-5 lg:grid-cols-3">
+          {departments.map((department, index) => {
+            const y = useTransform(scrollYProgress, [0, 0.18 + index * 0.08, 0.42 + index * 0.06], [90, 40, 0]);
+            const opacity = useTransform(scrollYProgress, [0.08 + index * 0.06, 0.25 + index * 0.06], [0, 1]);
+            const rotate = useTransform(scrollYProgress, [0, 0.35 + index * 0.05], [index % 2 === 0 ? -4 : 4, 0]);
+            const scale = useTransform(scrollYProgress, [0.12 + index * 0.05, 0.34 + index * 0.05], [0.92, 1]);
+
+            return (
+              <motion.div
+                key={department.name}
+                style={{ y, opacity, rotate, scale }}
+                className="group relative min-h-[320px] overflow-hidden rounded-[2rem] border border-red-950/60 bg-red-950/10 p-6 shadow-2xl shadow-black/25 backdrop-blur-xl"
+              >
+                <motion.div
+                  aria-hidden="true"
+                  className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#8E090B]/25 blur-3xl"
+                  animate={{ scale: [1, 1.16, 1], x: [0, -22, 0], y: [0, 18, 0] }}
+                  transition={{ duration: 7 + index, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <div className="relative flex items-start justify-between gap-4">
+                  <DepartmentSeal code={department.code} />
+                  <div className="rounded-full border border-red-900/60 bg-black/30 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-red-100/70">
+                    {department.value}
+                  </div>
+                </div>
+
+                <div className="relative mt-8">
+                  <h3 className="text-2xl font-semibold tracking-[-0.035em] text-white">{department.name}</h3>
+                  <div className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#8E090B]">Supplied</div>
+                  <p className="mt-2 text-base leading-7 text-red-100/80">{department.sold}</p>
+                  <div className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#8E090B]">Job Detail</div>
+                  <p className="mt-2 text-sm leading-6 text-red-100/60">{department.detail}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function KineticStrip() {
   const items = ["Verified Stock", "Urgent RFQs", "No Backorder Stories", "Emergency Fulfillment", "Institutional Supply"];
 
@@ -668,6 +792,7 @@ export default function MethodOneSolutionsMockup() {
         </header>
 
         <Hero />
+        <PastPerformanceSection />
         <KineticStrip />
         <ScrollBriefcaseExperience />
 

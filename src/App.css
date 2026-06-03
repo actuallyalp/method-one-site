@@ -804,7 +804,7 @@ p {
 .naics-panel {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1px;
   padding: 0;
   overflow: hidden;
@@ -813,11 +813,11 @@ p {
 
 .naics-panel div {
   display: grid;
-  min-height: 96px;
+  min-height: 86px;
   align-content: start;
-  gap: 10px;
+  gap: 8px;
   background: rgba(8, 12, 18, 0.98);
-  padding: 18px;
+  padding: 15px;
 }
 
 .naics-panel strong {

@@ -85,14 +85,23 @@ const processSteps = [
 ];
 
 const naicsCodes = [
-  ["339113", "Surgical appliance and supplies manufacturing"],
-  ["423450", "Medical, dental, and hospital equipment merchant wholesalers"],
-  ["423430", "Computer and peripheral equipment merchant wholesalers"],
-  ["423850", "Service establishment equipment merchant wholesalers"],
-  ["424120", "Stationery and office supplies merchant wholesalers"],
-  ["424210", "Drugs and druggists' sundries merchant wholesalers"],
-  ["424690", "Other chemical and allied products merchant wholesalers"],
-  ["561110", "Office administrative services"],
+  ["423450", "Medical, Dental, and Hospital Equipment and Supplies Merchant Wholesalers"],
+  ["622110", "General Medical and Surgical Hospitals"],
+  ["423490", "Other Professional Equipment and Supplies Merchant Wholesalers"],
+  ["423860", "Transportation Equipment and Supplies Merchant Wholesalers"],
+  ["423410", "Photographic Equipment and Supplies Merchant Wholesalers"],
+  ["339113", "Surgical Appliance and Supplies Manufacturing"],
+  ["339940", "Office Supplies Manufacturing"],
+  ["339114", "Dental Equipment and Supplies Manufacturing"],
+  ["453210", "Office Supplies and Stationery Stores"],
+  ["446199", "All Other Health and Personal Care Stores"],
+  ["424110", "Printing and Writing Paper Merchant Wholesalers"],
+  ["424120", "Stationery and Office Supplies Merchant Wholesalers"],
+  ["325130", "Synthetic Dye and Pigment Manufacturing"],
+  ["325992", "Photographic Film, Paper, Plate, and Chemical Manufacturing"],
+  ["315990", "Apparel Accessories and Other Apparel Manufacturing"],
+  ["334111", "Electronic Computer Manufacturing"],
+  ["423430", "Computer, Computer Peripheral Equipment, Software Merchant Wholesalers"],
 ];
 
 function MethodLogo() {

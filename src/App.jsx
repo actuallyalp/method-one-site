@@ -659,7 +659,7 @@ function RFQSection() {
       setFormData({ name: "", organization: "", email: "", phone: "", details: "", deliveryDate: "" });
     } catch {
       setStatus("error");
-      setMessage("Submission failed. Email Houston@methodonesolutions.com directly with the RFQ details.");
+      setMessage("Submission failed. Email service@methodonesolutions.com directly with the RFQ details.");
     }
   }
 
@@ -670,12 +670,9 @@ function RFQSection() {
           <div className="eyebrow">RFQ Inquiry</div>
           <h2>Send the RFQ. We’ll verify stock fast.</h2>
           <address>
-            <strong>Houston Demirgioglu</strong>
-            <span>GOV Business President of Sales</span>
-            <a href="tel:+17149884222">(714) 988-4222</a>
-            <a href="mailto:Houston@methodonesolutions.com">Houston@methodonesolutions.com</a>
-            <span>5212 Bolsa Ave Suite 2, Huntington Beach, CA 92649</span>
-          </address>
+            <strong>Contact Us</strong>
+            <a href="tel:+18773219876">(877) 321-9876</a>
+            <a href="mailto:service@methodonesolutions.com">service@methodonesolutions.com</a>
         </div>
         <form onSubmit={handleSubmit} className="rfq-form">
           <label>Name<input name="name" value={formData.name} onChange={updateField} autoComplete="name" /></label>

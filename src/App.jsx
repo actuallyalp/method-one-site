@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -9,6 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ACCENT = "#8E090B";
 const FORM_ENDPOINT = "https://formspree.io/f/mwvyvvpb";
+const CommandEnvironment = lazy(() => import("./CommandEnvironment.jsx"));
 
 const performance = [
   {
@@ -106,7 +107,7 @@ const naicsCodes = [
 
 function MethodLogo() {
   return (
-    <a className="brand" href="#top" aria-label="Method One Solutions home">
+    <a className="brand" href="#top" onClick={(event) => scrollToScene(event, "top")} aria-label="Method One Solutions home">
       <span className="brand-mark" aria-hidden="true">
         {Array.from({ length: 24 }, (_, index) => (
           <span key={index} style={{ rotate: `${index * 15}deg` }} />
@@ -118,6 +119,16 @@ function MethodLogo() {
       </span>
     </a>
   );
+}
+
+function scrollToScene(event, id) {
+  event.preventDefault();
+  const target = document.getElementById(id);
+  if (!target) return;
+  const trigger = ScrollTrigger.getAll().find((item) => item.trigger === target);
+  const top = trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top, behavior: "smooth" });
+  window.history.pushState(null, "", `#${id}`);
 }
 
 function useReducedMotion() {
@@ -218,6 +229,30 @@ function usePageAnimations(reducedMotion) {
     contexts.push(
       gsap.context(() => {
         const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: {
+            trigger: "#top",
+            start: "top top",
+            end: "+=1800",
+            pin: true,
+            scrub: 0.55,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.fromTo(".hero-content .eyebrow", { opacity: 0, x: -34 }, { opacity: 1, x: 0, duration: 0.35 })
+          .fromTo(".hero-content h1", { opacity: 0, y: 80, clipPath: "inset(0 0 100% 0)" }, { opacity: 1, y: 0, clipPath: "inset(0 0 0% 0)", duration: 0.85 }, "<0.08")
+          .fromTo(".hero-content p", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.55 }, ">-0.15")
+          .fromTo(".hero-actions a", { opacity: 0, y: 28, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, stagger: 0.12, duration: 0.5 }, ">-0.05")
+          .fromTo(".hero-telemetry span", { opacity: 0, y: 24, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, stagger: 0.12, duration: 0.55 }, "<0.12")
+          .to(".hero-content", { y: -70, scale: 0.96, opacity: 0.72, duration: 0.8 }, ">")
+          .to(".hero-telemetry", { y: -110, opacity: 0.22, duration: 0.8 }, "<");
+      }),
+    );
+
+    contexts.push(
+      gsap.context(() => {
+        const tl = gsap.timeline({
           defaults: { ease: "power2.out" },
           scrollTrigger: {
             trigger: ".performance-pin",
@@ -230,11 +265,36 @@ function usePageAnimations(reducedMotion) {
         });
 
         tl.from(".agency-node", { opacity: 0, scale: 0.68, y: 80, stagger: 0.16, duration: 0.9 })
+          .fromTo(".command-board", { rotateX: 10, z: -180 }, { rotateX: 0, z: 0, duration: 1.1 }, "<")
           .from(".network-line", { scaleX: 0, opacity: 0, transformOrigin: "left center", stagger: 0.08, duration: 0.65 }, "<0.15")
           .from(".award-card", { opacity: 0, y: 38, stagger: 0.15, duration: 0.7 }, "<0.25")
           .to(".board-sweep", { xPercent: 120, duration: 1.1 }, "<")
+          .fromTo(".agency-node strong", { scale: 0.82, opacity: 0.35 }, { scale: 1, opacity: 1, stagger: 0.06, duration: 0.6 }, "<0.1")
           .to(".agency-node", { y: (index) => (index % 2 === 0 ? -18 : 18), duration: 1.2 }, ">")
-          .to(".network-core", { scale: 1.12, boxShadow: "0 0 80px rgba(142,9,11,.55)", duration: 0.9 }, "<");
+          .to(".network-core", { scale: 1.12, boxShadow: "0 0 80px rgba(142,9,11,.55)", duration: 0.9 }, "<")
+          .to(".command-board", { rotateX: -6, y: -70, opacity: 0.35, duration: 0.75 }, ">");
+      }),
+    );
+
+    contexts.push(
+      gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: {
+            trigger: ".capabilities-section",
+            start: "top top",
+            end: "+=2400",
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.fromTo(".capabilities-section .section-copy", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.5 })
+          .fromTo(".capability-grid", { rotateX: 16, rotateY: -9, y: 120, scale: 0.86 }, { rotateX: 0, rotateY: 0, y: 0, scale: 1, duration: 0.8 }, "<0.15")
+          .fromTo(".capability-item", { opacity: 0, z: -120, y: 70 }, { opacity: 1, z: 0, y: 0, stagger: 0.08, duration: 0.9 }, "<0.1")
+          .to(".capability-item", { x: (index) => (index % 5 - 2) * 9, y: (index) => (Math.floor(index / 5) - 0.5) * 18, stagger: 0.04, duration: 0.7 }, ">")
+          .to(".capability-grid", { scale: 0.92, y: -85, opacity: 0.35, duration: 0.65 }, ">");
       }),
     );
 
@@ -261,7 +321,29 @@ function usePageAnimations(reducedMotion) {
           .to(".module", { x: (index) => [-360, 330, -300, 300, -180, 185][index], y: (index) => [-170, -145, 128, 155, -4, 18][index], rotate: (index) => [-8, 7, 6, -7, 0, 0][index], duration: 1.1 }, ">")
           .to(".doc-layer", { x: 0, y: (index) => index * 24, rotate: 0, duration: 0.8 }, "<")
           .to(".briefcase-unit", { y: -118, rotateY: 0, scale: 0.78, duration: 0.9 }, ">")
-          .from(".briefcase-exit", { opacity: 0, y: 50, duration: 0.7 }, "<0.2");
+          .from(".briefcase-exit", { opacity: 0, y: 50, duration: 0.7 }, "<0.2")
+          .to(".briefcase-stage", { scale: 0.92, opacity: 0.42, duration: 0.7 }, ">");
+      }),
+    );
+
+    contexts.push(
+      gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: {
+            trigger: ".principles-section",
+            start: "top top",
+            end: "+=1900",
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.fromTo(".principles-section .section-copy", { opacity: 0, x: -90 }, { opacity: 1, x: 0, duration: 0.55 })
+          .fromTo(".principle", { opacity: 0, rotateX: 16, y: 70 }, { opacity: 1, rotateX: 0, y: 0, stagger: 0.08, duration: 0.9 }, "<0.12")
+          .to(".principle", { z: (index) => (index % 2 ? 48 : -28), y: (index) => (index % 2 ? -18 : 18), duration: 0.9 }, ">")
+          .to(".principles-grid", { opacity: 0.28, scale: 0.92, duration: 0.65 }, ">");
       }),
     );
 
@@ -286,6 +368,49 @@ function usePageAnimations(reducedMotion) {
       }),
     );
 
+    contexts.push(
+      gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: {
+            trigger: ".vendor-section",
+            start: "top top",
+            end: "+=2200",
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.fromTo(".vendor-section .section-copy", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.5 })
+          .fromTo(".vendor-card", { opacity: 0, y: 80, rotateX: 18 }, { opacity: 1, y: 0, rotateX: 0, stagger: 0.12, duration: 0.7 }, "<0.12")
+          .fromTo(".naics-panel div", { opacity: 0, x: -32 }, { opacity: 1, x: 0, stagger: 0.035, duration: 0.9 }, ">-0.1")
+          .to(".naics-panel div", { y: (index) => (index % 3 - 1) * 10, stagger: 0.02, duration: 0.75 }, ">")
+          .to(".vendor-layout", { scale: 0.92, y: -70, opacity: 0.34, duration: 0.75 }, ">");
+      }),
+    );
+
+    contexts.push(
+      gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: {
+            trigger: ".rfq-section",
+            start: "top top",
+            end: "+=1600",
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.fromTo(".rfq-panel", { opacity: 0, y: 110, scale: 0.9, rotateX: 12 }, { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 0.75 })
+          .fromTo(".rfq-form label", { opacity: 0, y: 28 }, { opacity: 1, y: 0, stagger: 0.06, duration: 0.55 }, "<0.2")
+          .to(".rfq-panel", { boxShadow: "0 0 120px rgba(142,9,11,.28)", duration: 0.7 }, ">")
+          .to(".rfq-panel", { scale: 0.96, duration: 0.5 }, ">");
+      }),
+    );
+
     ScrollTrigger.refresh();
 
     return () => {
@@ -298,9 +423,6 @@ function usePageAnimations(reducedMotion) {
 function Hero() {
   return (
     <section id="top" className="hero-section">
-      <video className="hero-video" autoPlay muted loop playsInline preload="metadata">
-        <source src="/Method 1.mp4" type="video/mp4" />
-      </video>
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-content reveal">
         <div className="eyebrow">Federal medical logistics and procurement supplier</div>
@@ -311,8 +433,8 @@ function Hero() {
           institutional buyers.
         </p>
         <div className="hero-actions">
-          <a className="primary-action" href="#rfq">Send RFQ</a>
-          <a className="secondary-action" href="#performance">View Past Performance</a>
+          <a className="primary-action" href="#rfq" onClick={(event) => scrollToScene(event, "rfq")}>Send RFQ</a>
+          <a className="secondary-action" href="#performance" onClick={(event) => scrollToScene(event, "performance")}>View Past Performance</a>
         </div>
       </div>
       <aside className="hero-telemetry reveal" aria-label="Operating standards">
@@ -579,13 +701,16 @@ export default function App() {
 
   return (
     <main ref={rootRef} className="site-shell">
+      <Suspense fallback={<div className="command-environment" aria-hidden="true" />}>
+        <CommandEnvironment reducedMotion={reducedMotion} />
+      </Suspense>
       <header className="site-header">
         <MethodLogo />
         <nav aria-label="Primary navigation">
-          <a href="#performance">Performance</a>
-          <a href="#capabilities">Capabilities</a>
-          <a href="#process">Process</a>
-          <a href="#rfq">RFQ</a>
+          <a href="#performance" onClick={(event) => scrollToScene(event, "performance")}>Performance</a>
+          <a href="#capabilities" onClick={(event) => scrollToScene(event, "capabilities")}>Capabilities</a>
+          <a href="#process" onClick={(event) => scrollToScene(event, "process")}>Process</a>
+          <a href="#rfq" onClick={(event) => scrollToScene(event, "rfq")}>RFQ</a>
         </nav>
       </header>
       <Hero />

@@ -8,9 +8,10 @@
     "@vitejs/plugin-react": "latest",
     "gsap": "^3.12.7",
     "lenis": "^1.1.20",
-    "vite": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "three": "^0.184.0",
+    "vite": "latest"
   },
   "devDependencies": {
     "@tailwindcss/vite": "latest",

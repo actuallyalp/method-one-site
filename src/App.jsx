@@ -673,7 +673,7 @@ function RFQSection() {
             <strong>Contact Us</strong>
             <a href="tel:+18773219876">(877) 321-9876</a>
             <a href="mailto:service@methodonesolutions.com">service@methodonesolutions.com</a>
-          <address>
+          </address>
         </div>
         <form onSubmit={handleSubmit} className="rfq-form">
           <label>Name<input name="name" value={formData.name} onChange={updateField} autoComplete="name" /></label>

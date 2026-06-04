@@ -452,7 +452,6 @@ function PerformanceBoard() {
       <div className="section-copy reveal">
         <div className="eyebrow">Past Performance Command Board</div>
         <h2>Federal buying history mapped as an operating network.</h2>
-        <p>Agency value, supply context, and BPA references stay readable while the board assembles on scroll.</p>
       </div>
       <div className="command-board">
         <div className="board-sweep" aria-hidden="true" />
@@ -508,7 +507,6 @@ function BriefcaseReveal() {
       <div className="briefcase-copy reveal">
         <div className="eyebrow">Pinned Capability Reveal</div>
         <h2>The RFQ enters a controlled sourcing sequence.</h2>
-        <p>Case rotation, activation, documentation layers, and category organization are driven by scroll progress.</p>
       </div>
       <div className="briefcase-stage" aria-label="Animated briefcase capability reveal">
         <div className="case-light" aria-hidden="true" />

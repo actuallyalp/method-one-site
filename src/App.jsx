@@ -10,43 +10,57 @@ gsap.registerPlugin(ScrollTrigger);
 const ACCENT = "#8E090B";
 const FORM_ENDPOINT = "https://formspree.io/f/mwvyvvpb";
 const CommandEnvironment = lazy(() => import("./CommandEnvironment.jsx"));
+const BRAND_LOGO = "/assets/brand/method-one-logo.png";
+const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";
 
 const performance = [
   {
     code: "VA",
     agency: "Department of Veteran Affairs",
     value: "$3,500,000",
-    detail: "Medical, surgical, dental, laboratory, PPE, and operational supply support for federal healthcare facilities.",
+    detail: "Time-critical overnight delivery of high-demand medical expendables for facility-wide use in all departments.",
+    logo: "/assets/departments/veterans-affairs.png",
+    logoAlt: "Department of Veterans Affairs seal",
   },
   {
     code: "USAF",
     agency: "Department of United States Air Force",
     value: "$2,900,000",
-    detail: "Verified sourcing and accelerated delivery for time-sensitive medical logistics requirements.",
+    detail: "Time-critical delivery of high-demand, hard-to-source medical, dental, and lab supplies to support medical logistics.",
+    logo: "/assets/departments/air-force.png",
+    logoAlt: "Department of the Air Force seal",
   },
   {
     code: "NAVY",
     agency: "Department of Navy",
     value: "$2,750,000",
-    detail: "Medical, dental, lab, surgical, and PPE fulfillment aligned to mission continuity needs.",
+    detail: "Time-sensitive logistics support of critical medical, dental, and lab supplies and PPE supporting naval mission continuity.",
+    logo: "/assets/departments/navy.png",
+    logoAlt: "Department of the Navy seal",
   },
   {
     code: "ARMY",
     agency: "Department of Army",
     value: "$2,700,000",
-    detail: "S4-focused procurement support for high-demand supplies and operational readiness.",
+    detail: "Mission-critical supply support of medical, dental, and laboratory items and PPE in support of S4 readiness objectives.",
+    logo: "/assets/departments/army.png",
+    logoAlt: "Department of the Army seal",
   },
   {
     code: "IHS",
     agency: "Department of Indian Health Services",
     value: "$2,600,000",
-    detail: "Expedited supply coordination for healthcare teams operating across critical service windows.",
+    detail: "Expedited delivery of mission-essential medical, dental, and laboratory supplies and PPE for IHS healthcare facilities.",
+    logo: "/assets/departments/ihs-white.png",
+    logoAlt: "Indian Health Service mark",
   },
   {
     code: "DHS",
     agency: "Department of Homeland Security",
     value: "$2,300,000",
-    detail: "Office, technology, PPE, and sustainment supplies moved through priority procurement channels.",
+    detail: "Priority sustainment delivery of high-demand inks, toners, office supplies, electronics, and PPE supporting DHS operations.",
+    logo: "/assets/departments/homeland-security.png",
+    logoAlt: "Department of Homeland Security seal",
   },
 ];
 
@@ -108,15 +122,7 @@ const naicsCodes = [
 function MethodLogo() {
   return (
     <a className="brand" href="#top" onClick={(event) => scrollToScene(event, "top")} aria-label="Method One Solutions home">
-      <span className="brand-mark" aria-hidden="true">
-        {Array.from({ length: 24 }, (_, index) => (
-          <span key={index} style={{ rotate: `${index * 15}deg` }} />
-        ))}
-      </span>
-      <span className="brand-text">
-        <strong>method1</strong>
-        <em>solutions</em>
-      </span>
+      <img className="brand-logo" src={BRAND_LOGO} alt="Method One Solutions" width="230" height="53" decoding="async" />
     </a>
   );
 }
@@ -153,11 +159,11 @@ function useScrollSystems(reducedMotion) {
     }
 
     const lenis = new Lenis({
-      duration: 0.78,
+      duration: 0.62,
       smoothWheel: true,
-      wheelMultiplier: 0.92,
-      touchMultiplier: 1.08,
-      lerp: 0.11,
+      wheelMultiplier: 0.88,
+      touchMultiplier: 1,
+      lerp: 0.14,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
@@ -174,6 +180,17 @@ function useScrollSystems(reducedMotion) {
       lenis.destroy();
     };
   }, [reducedMotion]);
+
+  useEffect(() => {
+    const refresh = () => ScrollTrigger.refresh();
+    const timeout = window.setTimeout(refresh, 220);
+    window.addEventListener("load", refresh);
+    document.fonts?.ready?.then(refresh).catch(() => {});
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener("load", refresh);
+    };
+  }, []);
 }
 
 function usePageAnimations(reducedMotion) {
@@ -240,13 +257,16 @@ function usePageAnimations(reducedMotion) {
           },
         });
 
-        tl.fromTo(".hero-content .eyebrow", { opacity: 0, x: -34 }, { opacity: 1, x: 0, duration: 0.35 })
-          .fromTo(".hero-content h1", { opacity: 0, y: 80, clipPath: "inset(0 0 100% 0)" }, { opacity: 1, y: 0, clipPath: "inset(0 0 0% 0)", duration: 0.85 }, "<0.08")
-          .fromTo(".hero-content p", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.55 }, ">-0.15")
-          .fromTo(".hero-actions a", { opacity: 0, y: 28, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, stagger: 0.12, duration: 0.5 }, ">-0.05")
-          .fromTo(".hero-telemetry span", { opacity: 0, y: 24, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, stagger: 0.12, duration: 0.55 }, "<0.12")
-          .to(".hero-content", { y: -70, scale: 0.96, opacity: 0.72, duration: 0.8 }, ">")
-          .to(".hero-telemetry", { y: -110, opacity: 0.22, duration: 0.8 }, "<");
+        tl.set(".hero-content, .hero-content .eyebrow, .hero-content h1, .hero-content p, .hero-actions a, .hero-telemetry, .hero-telemetry span", {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          clipPath: "inset(0 0 0% 0)",
+        })
+          .to(".hero-grid", { backgroundPosition: "0 180px", duration: 0.75 }, 0)
+          .to(".hero-content", { y: -72, scale: 0.965, opacity: 0.76, duration: 0.82 }, 0.18)
+          .to(".hero-telemetry", { y: -96, opacity: 0.28, duration: 0.82 }, 0.18);
       }),
     );
 
@@ -259,12 +279,13 @@ function usePageAnimations(reducedMotion) {
             start: "top top",
             end: "+=2600",
             pin: true,
-            scrub: 0.45,
+            scrub: 0.38,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
-        tl.from(".agency-node", { opacity: 0, scale: 0.68, y: 80, stagger: 0.16, duration: 0.9 })
+        tl.from(".agency-node", { opacity: 0, scale: 0.74, y: 62, stagger: 0.13, duration: 0.75 })
           .fromTo(".command-board", { rotateX: 10, z: -180 }, { rotateX: 0, z: 0, duration: 1.1 }, "<")
           .from(".network-line", { scaleX: 0, opacity: 0, transformOrigin: "left center", stagger: 0.08, duration: 0.65 }, "<0.15")
           .from(".award-card", { opacity: 0, y: 38, stagger: 0.15, duration: 0.7 }, "<0.25")
@@ -305,24 +326,28 @@ function usePageAnimations(reducedMotion) {
           scrollTrigger: {
             trigger: ".briefcase-pin",
             start: "top top",
-            end: "+=3200",
+            end: "+=3600",
             pin: true,
-            scrub: 0.55,
+            scrub: 0.42,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
-        tl.fromTo(".briefcase-unit", { y: 170, rotateX: 18, rotateY: -34, scale: 0.72 }, { y: 0, rotateX: 6, rotateY: -12, scale: 1, duration: 0.9 })
-          .to(".briefcase-unit", { rotateY: 28, rotateX: -4, duration: 0.8 })
-          .to(".briefcase-lid", { rotateX: -116, y: -12, duration: 0.9 })
-          .to(".case-light", { opacity: 1, scale: 1.2, duration: 0.45 }, "<0.1")
-          .from(".module", { opacity: 0, y: 58, scale: 0.72, stagger: 0.1, duration: 0.75 }, "<0.2")
-          .from(".doc-layer", { opacity: 0, x: 80, rotate: 8, stagger: 0.12, duration: 0.7 }, "<0.15")
-          .to(".module", { x: (index) => [-360, 330, -300, 300, -180, 185][index], y: (index) => [-170, -145, 128, 155, -4, 18][index], rotate: (index) => [-8, 7, 6, -7, 0, 0][index], duration: 1.1 }, ">")
-          .to(".doc-layer", { x: 0, y: (index) => index * 24, rotate: 0, duration: 0.8 }, "<")
-          .to(".briefcase-unit", { y: -118, rotateY: 0, scale: 0.78, duration: 0.9 }, ">")
-          .from(".briefcase-exit", { opacity: 0, y: 50, duration: 0.7 }, "<0.2")
-          .to(".briefcase-stage", { scale: 0.92, opacity: 0.42, duration: 0.7 }, ">");
+        tl.fromTo(".briefcase-unit", { y: 180, rotateX: 24, rotateY: -38, rotateZ: -2, scale: 0.7 }, { y: 8, rotateX: 10, rotateY: -16, rotateZ: 0, scale: 1, duration: 0.9 })
+          .fromTo(".case-shadow", { opacity: 0, scale: 0.62, y: 90 }, { opacity: 0.72, scale: 1, y: 0, duration: 0.9 }, "<")
+          .to(".briefcase-unit", { rotateY: 24, rotateX: 2, y: -8, duration: 0.68 })
+          .to(".briefcase-lid", { rotateX: -118, y: -22, z: -22, duration: 1.05 })
+          .to(".briefcase-body", { rotateX: 4, duration: 0.75 }, "<0.1")
+          .to(".case-light", { opacity: 0.86, scale: 1.18, duration: 0.48 }, "<0.05")
+          .from(".module", { opacity: 0, y: 44, z: -90, rotateX: 14, scale: 0.78, stagger: 0.09, duration: 0.78 }, "<0.22")
+          .from(".doc-layer", { opacity: 0, x: 84, z: -80, rotateY: -16, rotate: 6, stagger: 0.12, duration: 0.76 }, "<0.12")
+          .to(".module", { x: (index) => [-340, 320, -292, 292, -160, 168][index], y: (index) => [-162, -140, 122, 148, -8, 16][index], z: (index) => [96, 74, 66, 88, 118, 118][index], rotate: (index) => [-7, 6, 5, -6, 0, 0][index], duration: 1.08 }, ">")
+          .to(".doc-layer", { x: 0, y: (index) => index * 22, z: (index) => index * 22, rotateY: 0, rotate: 0, duration: 0.86 }, "<")
+          .to(".briefcase-unit", { y: -104, rotateX: 7, rotateY: 0, scale: 0.82, duration: 0.88 }, ">")
+          .to(".case-light", { opacity: 0.38, scale: 0.9, duration: 0.72 }, "<")
+          .from(".briefcase-exit", { opacity: 0, y: 42, duration: 0.66 }, "<0.18")
+          .to(".briefcase-stage", { scale: 0.94, opacity: 0.48, duration: 0.68 }, ">");
       }),
     );
 
@@ -337,6 +362,7 @@ function usePageAnimations(reducedMotion) {
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
@@ -358,6 +384,7 @@ function usePageAnimations(reducedMotion) {
             pin: true,
             scrub: 0.45,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
@@ -379,6 +406,7 @@ function usePageAnimations(reducedMotion) {
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
@@ -401,6 +429,7 @@ function usePageAnimations(reducedMotion) {
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
@@ -459,16 +488,21 @@ function PerformanceBoard() {
           <strong>$1.43M</strong>
           <span>Awarded</span>
         </div>
-        {performance.map((item, index) => (
-          <article className={`agency-node node-${index + 1}`} key={item.agency}>
-            <span className="agency-code">{item.code}</span>
-            <div>
-              <h3>{item.agency}</h3>
-              <strong>{item.value}</strong>
-              <p>{item.detail}</p>
-            </div>
-          </article>
-        ))}
+        <div className="agency-grid">
+          {performance.map((item, index) => (
+            <article className={`agency-node node-${index + 1}`} key={item.agency}>
+              <span className="agency-seal">
+                <img src={item.logo} alt={item.logoAlt} loading="lazy" decoding="async" />
+              </span>
+              <div>
+                <span className="agency-code">{item.code}</span>
+                <h3>{item.agency}</h3>
+                <strong>{item.value}</strong>
+                <p>{item.detail}</p>
+              </div>
+            </article>
+          ))}
+        </div>
         {Array.from({ length: 6 }, (_, index) => <span className={`network-line line-${index + 1}`} key={index} />)}
         <div className="award-rail">
           <div className="award-card">BPA 75H71022P00407</div>
@@ -510,15 +544,19 @@ function BriefcaseReveal() {
       </div>
       <div className="briefcase-stage" aria-label="Animated briefcase capability reveal">
         <div className="case-light" aria-hidden="true" />
+        <div className="case-shadow" aria-hidden="true" />
         <div className="briefcase-unit">
           <div className="briefcase-handle" />
           <div className="briefcase-lid">
             <span />
           </div>
           <div className="briefcase-body">
-            <span className="case-lock" />
+            <span className="case-lock">
+              <img src={BRAND_SUN_LOGO} alt="" aria-hidden="true" />
+            </span>
             <span className="case-rib rib-one" />
             <span className="case-rib rib-two" />
+            <span className="case-depth" />
           </div>
         </div>
         <div className="module-field">

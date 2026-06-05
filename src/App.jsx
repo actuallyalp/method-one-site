@@ -569,7 +569,6 @@ function BriefcaseReveal() {
         </div>
         <div className="briefcase-exit">
           <strong>Verified package ready</strong>
-          <span>Quote, documentation, and delivery path aligned.</span>
         </div>
       </div>
     </section>

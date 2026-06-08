@@ -12,6 +12,8 @@ const FORM_ENDPOINT = "https://formspree.io/f/mwvyvvpb";
 const CommandEnvironment = lazy(() => import("./CommandEnvironment.jsx"));
 const BRAND_LOGO = "/assets/brand/method-one-logo.png";
 const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";
+const COMPANY_NAME = "Method One Solutions";
+const WEBSITE_URL = "https://www.methodonesolutions.com";
 
 const performance = [
   {
@@ -119,22 +121,54 @@ const naicsCodes = [
   ["423430", "Computer, Computer Peripheral Equipment, Software Merchant Wholesalers"],
 ];
 
-function MethodLogo() {
+function MethodLogo({ legalPage = false }) {
   return (
-    <a className="brand" href="#top" onClick={(event) => scrollToScene(event, "top")} aria-label="Method One Solutions home">
+    <a className="brand" href={legalPage ? "/" : "#top"} onClick={legalPage ? undefined : (event) => scrollToScene(event, "top")} aria-label="Method One Solutions home">
       <img className="brand-logo" src={BRAND_LOGO} alt="Method One Solutions" width="230" height="53" decoding="async" />
     </a>
   );
 }
 
 function scrollToScene(event, id) {
-  event.preventDefault();
   const target = document.getElementById(id);
   if (!target) return;
+  event.preventDefault();
   const trigger = ScrollTrigger.getAll().find((item) => item.trigger === target);
   const top = trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
   window.scrollTo({ top, behavior: "smooth" });
   window.history.pushState(null, "", `#${id}`);
+}
+
+function SiteHeader({ legalPage = false }) {
+  const linkProps = (id) => ({
+    href: legalPage ? `/#${id}` : `#${id}`,
+    onClick: legalPage ? undefined : (event) => scrollToScene(event, id),
+  });
+
+  return (
+    <header className="site-header">
+      <MethodLogo legalPage={legalPage} />
+      <nav aria-label="Primary navigation">
+        <a {...linkProps("performance")}>Performance</a>
+        <a {...linkProps("capabilities")}>Capabilities</a>
+        <a {...linkProps("process")}>Process</a>
+        <a {...linkProps("rfq")}>RFQ</a>
+      </nav>
+    </header>
+  );
+}
+
+function SiteFooter({ legalPage = false }) {
+  return (
+    <footer className="site-footer">
+      <MethodLogo legalPage={legalPage} />
+      <span>Verified stock. Fast communication. Federal-ready execution.</span>
+      <nav className="footer-links" aria-label="Legal pages">
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-and-conditions">Terms &amp; Conditions</a>
+      </nav>
+    </footer>
+  );
 }
 
 function useReducedMotion() {
@@ -151,8 +185,13 @@ function useReducedMotion() {
   return reduced;
 }
 
-function useScrollSystems(reducedMotion) {
+function useScrollSystems(reducedMotion, enabled = true) {
   useEffect(() => {
+    if (!enabled) {
+      ScrollTrigger.refresh();
+      return undefined;
+    }
+
     if (reducedMotion) {
       ScrollTrigger.refresh();
       return undefined;
@@ -179,7 +218,7 @@ function useScrollSystems(reducedMotion) {
       gsap.ticker.remove(raf);
       lenis.destroy();
     };
-  }, [reducedMotion]);
+  }, [enabled, reducedMotion]);
 
   useEffect(() => {
     const refresh = () => ScrollTrigger.refresh();
@@ -193,8 +232,13 @@ function useScrollSystems(reducedMotion) {
   }, []);
 }
 
-function usePageAnimations(reducedMotion) {
+function usePageAnimations(reducedMotion, enabled = true) {
   useEffect(() => {
+    if (!enabled) {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      return undefined;
+    }
+
     const contexts = [];
     const isCompact = window.matchMedia("(max-width: 760px)").matches;
 
@@ -446,7 +490,7 @@ function usePageAnimations(reducedMotion) {
       contexts.forEach((context) => context.revert());
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, [reducedMotion]);
+  }, [enabled, reducedMotion]);
 }
 
 function Hero() {
@@ -661,12 +705,14 @@ function RFQSection() {
     phone: "",
     details: "",
     deliveryDate: "",
+    sms_consent: false,
   });
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
 
   function updateField(event) {
-    setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
+    const { name, type, checked, value } = event.target;
+    setFormData((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
   }
 
   async function handleSubmit(event) {
@@ -691,7 +737,7 @@ function RFQSection() {
 
       setStatus("success");
       setMessage("RFQ sent. Method One will review the details and respond quickly.");
-      setFormData({ name: "", organization: "", email: "", phone: "", details: "", deliveryDate: "" });
+      setFormData({ name: "", organization: "", email: "", phone: "", details: "", deliveryDate: "", sms_consent: false });
     } catch {
       setStatus("error");
       setMessage("Submission failed. Email service@methodonesolutions.com directly with the RFQ details.");
@@ -715,6 +761,16 @@ function RFQSection() {
           <label>Organization<input name="organization" value={formData.organization} onChange={updateField} autoComplete="organization" /></label>
           <label>Email<input name="email" value={formData.email} onChange={updateField} type="email" autoComplete="email" /></label>
           <label>Phone<input name="phone" value={formData.phone} onChange={updateField} type="tel" autoComplete="tel" /></label>
+          <label className="sms-consent full">
+            <input name="sms_consent" checked={formData.sms_consent} onChange={updateField} type="checkbox" />
+            <span>
+              By checking this box, you agree to receive SMS messages from Method One Solutions related to conversational purposes,
+              including RFQ updates, procurement communication, order coordination, availability confirmations, service follow-ups,
+              and customer support. You may reply STOP to opt out at any time. Reply HELP for assistance. Message and data rates
+              may apply. Message frequency may vary. Learn more on our <a href="/privacy-policy">Privacy Policy</a> page and{" "}
+              <a href="/terms-and-conditions">Terms &amp; Conditions</a>.
+            </span>
+          </label>
           <label className="full">RFQ / item details<textarea name="details" value={formData.details} onChange={updateField} /></label>
           <label>Required delivery date<input name="deliveryDate" value={formData.deliveryDate} onChange={updateField} type="date" /></label>
           <button disabled={status === "submitting"}>{status === "submitting" ? "Sending..." : "Submit RFQ"}</button>
@@ -725,27 +781,251 @@ function RFQSection() {
   );
 }
 
+function LegalPage({ type }) {
+  const isPrivacy = type === "privacy";
+
+  return (
+    <main className="site-shell legal-shell">
+      <Suspense fallback={<div className="command-environment" aria-hidden="true" />}>
+        <CommandEnvironment reducedMotion />
+      </Suspense>
+      <SiteHeader legalPage />
+      {isPrivacy ? <PrivacyPolicyContent /> : <TermsContent />}
+      <SiteFooter legalPage />
+    </main>
+  );
+}
+
+function LegalSection({ title, children }) {
+  return (
+    <section className="legal-section">
+      <h2>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function PrivacyPolicyContent() {
+  return (
+    <article className="legal-content">
+      <header className="legal-hero">
+        <div className="eyebrow">Method One Solutions</div>
+        <h1>Privacy Policy &amp; SMS Terms of Service</h1>
+        <p>Effective Date: April 15, 2026</p>
+      </header>
+
+      <LegalSection title="1. Introduction">
+        <p>Method One Solutions (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting the privacy of individuals who interact with our services. This Privacy Policy describes how we collect, use, disclose, and safeguard personal information in connection with our sales and lead generation activities, including our use of SMS/text message communications.</p>
+        <p>By providing your contact information or opting into our SMS communications, you agree to the practices described in this Privacy Policy.</p>
+      </LegalSection>
+
+      <LegalSection title="2. Information We Collect">
+        <p>We may collect the following categories of personal information:</p>
+        <ul>
+          <li>Full name</li>
+          <li>Phone number (including mobile numbers used for SMS communications)</li>
+          <li>Email address</li>
+          <li>Communication preferences and opt-in/opt-out status</li>
+          <li>Device and usage information collected automatically (e.g., browser type, IP address, pages visited) through cookies and analytics tools</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="3. How We Collect Information">
+        <p>We collect personal information in the following ways:</p>
+        <ul>
+          <li>Directly from you when you fill out a contact form, request information, or voluntarily provide it</li>
+          <li>When you opt in to receive SMS/text message communications from us</li>
+          <li>Through our website via cookies and third-party analytics tools (e.g., Google Analytics)</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="4. How We Use Your Information">
+        <p>We use the personal information we collect for the following purposes:</p>
+        <ul>
+          <li>To contact you regarding our products, services, and sales opportunities</li>
+          <li>To send you SMS/text messages you have opted into, including promotional, informational, and transactional messages</li>
+          <li>To respond to your inquiries and provide customer support</li>
+          <li>To improve our website, services, and communications</li>
+          <li>To comply with applicable laws and regulations</li>
+          <li>To manage and maintain our business operations</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="5. SMS Communications">
+        <p>By opting into SMS from a web form or other medium, you are agreeing to receive SMS messages from Method One Solutions. This includes SMS messages for conversations related to our sales and lead generation services.</p>
+        <p><strong>Message Frequency:</strong> Message frequency may vary based on your interactions with us.</p>
+        <p><strong>Message &amp; Data Rates:</strong> Message and data rates may apply. Please consult your mobile carrier for details.</p>
+        <p><strong>Opt-Out:</strong> To opt out at any time, text STOP to any message from us.</p>
+        <p><strong>Help:</strong> For assistance, text HELP to any message or visit our website at <a href={WEBSITE_URL}>{WEBSITE_URL}</a>.</p>
+        <p>You may also contact us by phone at:</p>
+        <p><a href="tel:+18773219876">(877) 321-9876</a></p>
+        <p><strong>Privacy Policy:</strong> <a href={`${WEBSITE_URL}/privacy-policy`}>{WEBSITE_URL}/privacy-policy</a></p>
+        <p><strong>Terms &amp; Conditions:</strong> <a href={`${WEBSITE_URL}/terms-and-conditions`}>{WEBSITE_URL}/terms-and-conditions</a></p>
+        <p>SMS Consent is not shared with third parties or affiliates for marketing or promotional purposes.</p>
+        <p>SMS Consent, and phone numbers collected for SMS communication purposes will not be shared with any third party or affiliates for marketing purposes.</p>
+      </LegalSection>
+
+      <LegalSection title="6. Sharing of Personal Information">
+        <p>We do not sell your personal information.</p>
+        <p>We do not share your personal information with third parties for marketing, advertising, or promotional purposes.</p>
+        <p>Your information is kept strictly internal and used solely by Method One Solutions for the purposes described in this Privacy Policy.</p>
+        <p>We may disclose your information only in the following limited circumstances:</p>
+        <ul>
+          <li>When required by law, regulation, court order, or government authority</li>
+          <li>In connection with a business merger, acquisition, or sale of substantially all assets</li>
+          <li>To protect the rights, property, or safety of Method One Solutions, its clients, or others</li>
+        </ul>
+        <p>Mobile opt-in data, SMS consent, and phone numbers collected for SMS communications will never be shared with any third party under any circumstances.</p>
+      </LegalSection>
+
+      <LegalSection title="7. Cookies and Tracking Technologies">
+        <p>Our website uses cookies and similar tracking technologies to enhance browsing experience, analyze site traffic, and understand how visitors interact with our site.</p>
+        <p>We may use tools such as Google Analytics.</p>
+        <p>Users may disable cookies through browser settings.</p>
+      </LegalSection>
+
+      <LegalSection title="8. Data Retention">
+        <p>We retain personal information for as long as necessary to fulfill the purposes described in this Privacy Policy, comply with legal obligations, and resolve disputes.</p>
+        <p>SMS opt-in and opt-out records are retained in accordance with applicable telecommunications regulations.</p>
+      </LegalSection>
+
+      <LegalSection title="9. Data Security">
+        <p>We implement reasonable administrative, technical, and physical safeguards to protect personal information.</p>
+        <p>However, no method of transmission over the internet can be guaranteed as completely secure.</p>
+      </LegalSection>
+
+      <LegalSection title="10. Your Privacy Rights">
+        <p>Depending on location, users may have rights including:</p>
+        <ul>
+          <li>Knowing what information is collected</li>
+          <li>Requesting deletion</li>
+          <li>Opting out of information sharing</li>
+          <li>Protection against discrimination for exercising privacy rights</li>
+        </ul>
+        <p>California residents may have additional rights under CCPA and CalOPPA.</p>
+      </LegalSection>
+
+      <LegalSection title="11. Children's Privacy">
+        <p>Our services are not directed to individuals under 18 years old.</p>
+      </LegalSection>
+
+      <LegalSection title="12. Changes to This Privacy Policy">
+        <p>We may update this Privacy Policy periodically.</p>
+        <p>Changes will be reflected through an updated effective date.</p>
+      </LegalSection>
+
+      <LegalSection title="13. Contact Information">
+        <p>{COMPANY_NAME}</p>
+        <p><strong>Phone:</strong> <a href="tel:+18773219876">(877) 321-9876</a></p>
+        <p><strong>Website:</strong> <a href={WEBSITE_URL}>{WEBSITE_URL}</a></p>
+        <p><strong>Email:</strong> <a href="mailto:service@methodonesolutions.com">service@methodonesolutions.com</a></p>
+      </LegalSection>
+    </article>
+  );
+}
+
+function TermsContent() {
+  return (
+    <article className="legal-content">
+      <header className="legal-hero">
+        <div className="eyebrow">Method One Solutions</div>
+        <h1>Terms &amp; Conditions</h1>
+        <p>Effective Date: April 15, 2026</p>
+      </header>
+
+      <LegalSection title="1. Website Use">
+        <p>By using this website, you agree to use it only for lawful business purposes.</p>
+      </LegalSection>
+
+      <LegalSection title="2. RFQ & Procurement Communications">
+        <p>Submitting an RFQ or contact request does not create a binding agreement.</p>
+        <p>Method One Solutions may contact you regarding procurement requests, sourcing inquiries, RFQ clarifications, availability confirmations, logistics coordination, and customer support.</p>
+      </LegalSection>
+
+      <LegalSection title="3. SMS Consent Communication">
+        <p>The information obtained as part of the SMS consent process will not be shared with third parties for marketing purposes.</p>
+      </LegalSection>
+
+      <LegalSection title="4. Types of SMS Communications">
+        <p>If you consent to receive SMS messages from Method One Solutions, you may receive messages related to:</p>
+        <ul>
+          <li>RFQ updates</li>
+          <li>Procurement communication</li>
+          <li>Order coordination</li>
+          <li>Availability confirmations</li>
+          <li>Service follow-ups</li>
+          <li>Customer support</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="5. Message Frequency">
+        <p>Message frequency may vary depending on communication needs.</p>
+        <p>Users may receive up to 5 SMS messages per week.</p>
+      </LegalSection>
+
+      <LegalSection title="6. Potential Fees">
+        <p>Message and data rates may apply depending on the carrier's pricing plan.</p>
+      </LegalSection>
+
+      <LegalSection title="7. Opt-In Method">
+        <p>Users may opt in through the website form by checking the SMS consent checkbox.</p>
+      </LegalSection>
+
+      <LegalSection title="8. Opt-Out Method">
+        <p>Users may opt out at any time by replying STOP to any SMS message received from Method One Solutions.</p>
+        <p>Users may also request removal by contacting the company directly.</p>
+      </LegalSection>
+
+      <LegalSection title="9. Help">
+        <p>For assistance:</p>
+        <p>Reply HELP to any SMS message.</p>
+        <p>Or contact:</p>
+        <p><a href="mailto:service@methodonesolutions.com">service@methodonesolutions.com</a></p>
+        <p><strong>Phone:</strong> <a href="tel:+18773219876">(877) 321-9876</a></p>
+      </LegalSection>
+
+      <LegalSection title="10. Standard Messaging Disclosures">
+        <ul>
+          <li>Message and data rates may apply.</li>
+          <li>Text STOP to opt out.</li>
+          <li>Text HELP for assistance.</li>
+          <li>Message frequency may vary.</li>
+          <li>Visit the <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-and-conditions">Terms &amp; Conditions</a> pages for more information.</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="11. Limitation">
+        <p>Nothing on this website guarantees product availability, pricing, delivery schedules, RFQ acceptance, or procurement outcomes.</p>
+      </LegalSection>
+
+      <LegalSection title="12. Contact Information">
+        <p>{COMPANY_NAME}</p>
+        <p><strong>Phone:</strong> <a href="tel:+18773219876">(877) 321-9876</a></p>
+        <p><strong>Website:</strong> <a href={WEBSITE_URL}>{WEBSITE_URL}</a></p>
+        <p><strong>Email:</strong> <a href="mailto:service@methodonesolutions.com">service@methodonesolutions.com</a></p>
+      </LegalSection>
+    </article>
+  );
+}
+
 export default function App() {
   const reducedMotion = useReducedMotion();
   const rootRef = useRef(null);
+  const route = typeof window === "undefined" ? "/" : window.location.pathname.replace(/\/$/, "") || "/";
+  const isLegalRoute = route === "/privacy-policy" || route === "/terms-and-conditions";
 
-  useScrollSystems(reducedMotion);
-  usePageAnimations(reducedMotion);
+  useScrollSystems(reducedMotion, !isLegalRoute);
+  usePageAnimations(reducedMotion, !isLegalRoute);
+
+  if (route === "/privacy-policy") return <LegalPage type="privacy" />;
+  if (route === "/terms-and-conditions") return <LegalPage type="terms" />;
 
   return (
     <main ref={rootRef} className="site-shell">
       <Suspense fallback={<div className="command-environment" aria-hidden="true" />}>
         <CommandEnvironment reducedMotion={reducedMotion} />
       </Suspense>
-      <header className="site-header">
-        <MethodLogo />
-        <nav aria-label="Primary navigation">
-          <a href="#performance" onClick={(event) => scrollToScene(event, "performance")}>Performance</a>
-          <a href="#capabilities" onClick={(event) => scrollToScene(event, "capabilities")}>Capabilities</a>
-          <a href="#process" onClick={(event) => scrollToScene(event, "process")}>Process</a>
-          <a href="#rfq" onClick={(event) => scrollToScene(event, "rfq")}>RFQ</a>
-        </nav>
-      </header>
+      <SiteHeader />
       <Hero />
       <PerformanceBoard />
       <CapabilityGrid />
@@ -754,10 +1034,7 @@ export default function App() {
       <ProcessSection />
       <VendorProfile />
       <RFQSection />
-      <footer className="site-footer">
-        <MethodLogo />
-        <span>Verified stock. Fast communication. Federal-ready execution.</span>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

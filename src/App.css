@@ -269,7 +269,7 @@ p {
 .secondary-action,
 .rfq-form button,
 .agency-node,
-.capability-item,
+.capability-pod,
 .principle,
 .vendor-card {
   transition: transform 240ms ease, border-color 240ms ease, background 240ms ease, box-shadow 240ms ease;
@@ -371,7 +371,7 @@ p {
 
 .command-board {
   position: absolute;
-  inset: clamp(260px, 31vh, 330px) clamp(18px, 5vw, 72px) 8vh;
+  inset: clamp(292px, 36vh, 372px) clamp(18px, 5vw, 72px) 6vh;
   overflow: hidden;
   transform-style: preserve-3d;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -436,6 +436,7 @@ p {
   display: grid;
   grid-template-columns: 46px 1fr;
   gap: 13px;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   padding: 14px;
@@ -446,7 +447,7 @@ p {
 }
 
 .agency-node:hover,
-.capability-item:hover,
+.capability-pod:hover .capability-pod-inner,
 .principle:hover,
 .vendor-card:hover {
   transform: translateY(-6px) translateZ(34px);
@@ -552,43 +553,143 @@ p {
 }
 
 .capabilities-section {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(14px, 2vh, 26px);
+  overflow: hidden;
+  padding-top: clamp(82px, 8vh, 108px);
+  padding-bottom: clamp(28px, 5vh, 56px);
   background:
+    radial-gradient(circle at 50% 56%, rgba(142, 9, 11, 0.24), transparent 30%),
     radial-gradient(circle at 78% 22%, rgba(142, 9, 11, 0.16), transparent 30%),
     rgba(7, 10, 15, 0.74);
   perspective: 1500px;
 }
 
-.capability-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1px;
-  margin-top: 54px;
-  border: 1px solid var(--line);
-  background: var(--line);
+.capabilities-section .section-copy {
+  width: min(760px, 72vw);
+}
+
+.capabilities-section .section-copy h2 {
+  font-size: clamp(1.9rem, 3.4vw, 3.65rem);
+}
+
+.capability-orbit-stage {
+  position: relative;
+  width: min(1120px, 100%);
+  min-height: min(610px, calc(100svh - 245px));
+  margin: -8px auto 0;
   transform-style: preserve-3d;
 }
 
-.capability-item {
-  min-height: 190px;
+.capability-gridlines {
+  position: absolute;
+  inset: 4% 8%;
+  border-radius: 50%;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.075), transparent 42%),
-    rgba(11, 16, 23, 0.84);
-  padding: 22px;
+    radial-gradient(circle, transparent 0 20%, rgba(192, 24, 28, 0.22) 20.2% 20.5%, transparent 20.8% 39%, rgba(255, 255, 255, 0.09) 39.2% 39.5%, transparent 39.8% 59%, rgba(192, 24, 28, 0.16) 59.2% 59.6%, transparent 59.9%),
+    conic-gradient(from 8deg, rgba(255, 255, 255, 0.13), transparent 8deg 26deg, rgba(192, 24, 28, 0.2) 31deg, transparent 38deg 62deg);
+  opacity: 0.34;
+  filter: blur(0.2px);
+  animation: capability-grid-pulse 5.6s ease-in-out infinite;
+}
+
+.capability-energy {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: min(430px, 44vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 1px solid rgba(192, 24, 28, 0.28);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(142, 9, 11, 0.26), transparent 68%);
+  box-shadow: 0 0 70px rgba(142, 9, 11, 0.18);
+  pointer-events: none;
+}
+
+.capability-particle {
+  position: absolute;
+  z-index: 1;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 96, 101, 0.82);
+  box-shadow: 0 0 18px rgba(192, 24, 28, 0.74);
+  pointer-events: none;
+}
+
+.capability-sun-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  width: clamp(112px, 12vw, 154px);
+  aspect-ratio: 1;
+  place-items: center;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(5, 7, 11, 0.95) 38%, rgba(142, 9, 11, 0.24) 70%, transparent 72%);
+  box-shadow: 0 0 32px rgba(142, 9, 11, 0.58), 0 0 96px rgba(142, 9, 11, 0.26);
+}
+
+.capability-sun-core img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(192, 24, 28, 0.52));
+}
+
+.capability-pod {
+  position: absolute;
+  z-index: 3;
+  width: clamp(184px, 18vw, 232px);
+  translate: -50% -50%;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.capability-pod-inner {
+  min-height: 82px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09), transparent 44%),
+    rgba(11, 16, 23, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  padding: 15px 18px 16px;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.34), inset 0 0 22px rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(12px);
   transform-style: preserve-3d;
 }
 
-.capability-item span {
+.capability-pod span {
+  display: block;
   color: var(--accent-bright);
-  font-size: 0.76rem;
+  font-size: 0.66rem;
   font-weight: 950;
   letter-spacing: 0.16em;
 }
 
-.capability-item h3 {
-  margin-top: 48px;
-  font-size: 1rem;
+.capability-pod h3 {
+  margin-top: 7px;
+  font-size: clamp(0.72rem, 0.84vw, 0.88rem);
   font-weight: 780;
-  line-height: 1.32;
+  line-height: 1.24;
+}
+
+@keyframes capability-grid-pulse {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.24;
+  }
+
+  50% {
+    transform: scale(1.04);
+    opacity: 0.42;
+  }
 }
 
 .briefcase-pin {
@@ -1209,13 +1310,20 @@ p {
 
 @media (max-width: 1080px) {
   .command-board {
-    inset: clamp(280px, 34vh, 350px) 18px 6vh;
+    inset: clamp(310px, 38vh, 390px) 18px 5vh;
   }
 
-  .capability-grid,
   .principles-grid,
   .naics-panel {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .capability-orbit-stage {
+    min-height: min(590px, calc(100svh - 235px));
+  }
+
+  .capability-pod {
+    width: clamp(170px, 20vw, 214px);
   }
 
   .process-board {
@@ -1318,12 +1426,58 @@ p {
     transform: none;
   }
 
-  .capability-grid,
   .principles-grid,
   .vendor-layout,
   .naics-panel,
   .rfq-form {
     grid-template-columns: 1fr;
+  }
+
+  .capabilities-section {
+    display: block;
+    min-height: auto;
+  }
+
+  .capabilities-section .section-copy {
+    width: 100%;
+  }
+
+  .capability-orbit-stage {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: auto;
+    margin-top: 34px;
+  }
+
+  .capability-gridlines,
+  .capability-energy,
+  .capability-particle {
+    display: none;
+  }
+
+  .capability-sun-core {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 118px;
+    margin: 0 auto 10px;
+    translate: none;
+    transform: none;
+  }
+
+  .capability-pod {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    width: 100%;
+    translate: none;
+    transform: none !important;
+  }
+
+  .capability-pod-inner {
+    min-height: auto;
+    border-radius: 8px;
   }
 
   .briefcase-stage {
@@ -1414,6 +1568,7 @@ p {
   }
 
   .command-board,
+  .capability-orbit-stage,
   .briefcase-stage {
     position: relative;
     inset: auto;
@@ -1426,6 +1581,8 @@ p {
   }
 
   .agency-node,
+  .capability-pod,
+  .capability-sun-core,
   .network-core,
   .award-rail,
   .briefcase-unit,
@@ -1433,6 +1590,13 @@ p {
   .doc-layers,
   .briefcase-exit {
     opacity: 1 !important;
+    translate: none !important;
     transform: none !important;
+  }
+
+  .capability-gridlines,
+  .capability-energy,
+  .capability-particle {
+    display: none;
   }
 }

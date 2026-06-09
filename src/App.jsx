@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -83,6 +84,32 @@ const capabilities = [
   "Electronics, I.T. Equipment, and Technology Products",
 ];
 
+const capabilityPodPositions = [
+  [50, 8],
+  [72, 13],
+  [89, 34],
+  [87, 62],
+  [69, 82],
+  [50, 88],
+  [31, 82],
+  [13, 62],
+  [11, 34],
+  [28, 13],
+];
+
+const capabilityParticles = [
+  [50, 50, -128, -84],
+  [50, 50, 116, -98],
+  [50, 50, 158, 18],
+  [50, 50, 112, 116],
+  [50, 50, -92, 138],
+  [50, 50, -164, 28],
+  [50, 50, -34, -148],
+  [50, 50, 42, 152],
+  [50, 50, 178, -54],
+  [50, 50, -178, -42],
+];
+
 const differentiators = [
   "Account representatives available from 4AM PST",
   "Emails responded to within minutes",
@@ -147,7 +174,7 @@ function getNavTargetY(sectionId) {
   const headerOffset = document.querySelector(".site-header")?.offsetHeight ?? 0;
 
   if (sectionId === "performance") return sectionTop + sectionDistance * 0.55;
-  if (sectionId === "capabilities") return sectionTop + sectionDistance * 0.3;
+  if (sectionId === "capabilities") return sectionTop + sectionDistance * 0.48;
   if (sectionId === "process") return sectionTop + sectionDistance * 0.5;
   if (sectionId === "rfq") return sectionTop + sectionDistance * 0.45;
 
@@ -357,7 +384,7 @@ function usePageAnimations(reducedMotion, enabled = true) {
     const isCompact = window.matchMedia("(max-width: 760px)").matches;
 
     if (reducedMotion) {
-      gsap.set(".reveal, .agency-node, .capability-item, .principle, .vendor-card, .rfq-panel", {
+      gsap.set(".reveal, .agency-node, .capability-pod, .principle, .vendor-card, .rfq-panel", {
         opacity: 1,
         y: 0,
         clearProps: "transform",
@@ -470,10 +497,9 @@ function usePageAnimations(reducedMotion, enabled = true) {
         });
 
         tl.fromTo(".capabilities-section .section-copy", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.5 })
-          .fromTo(".capability-grid", { rotateX: 16, rotateY: -9, y: 120, scale: 0.86 }, { rotateX: 0, rotateY: 0, y: 0, scale: 1, duration: 0.8 }, "<0.15")
-          .fromTo(".capability-item", { opacity: 0, z: -120, y: 70 }, { opacity: 1, z: 0, y: 0, stagger: 0.08, duration: 0.9 }, "<0.1")
-          .to(".capability-item", { x: (index) => (index % 5 - 2) * 9, y: (index) => (Math.floor(index / 5) - 0.5) * 18, stagger: 0.04, duration: 0.7 }, ">")
-          .to(".capability-grid", { scale: 0.92, y: -85, opacity: 0.35, duration: 0.65 }, ">");
+          .fromTo(".capability-orbit-stage", { rotateX: 12, y: 64, scale: 0.94 }, { rotateX: 0, y: 0, scale: 1, duration: 0.8 }, "<0.15")
+          .to(".capability-energy", { scale: 1.08, opacity: 0.9, duration: 0.9 }, "<0.2")
+          .to(".capability-orbit-stage", { scale: 0.98, y: -22, duration: 0.65 }, ">");
       }),
     );
 
@@ -679,12 +705,62 @@ function CapabilityGrid() {
         <div className="eyebrow">Core Capabilities</div>
         <h2>Coverage across critical medical, facility, administrative, and technology supply lines.</h2>
       </div>
-      <div className="capability-grid">
+      <div className="capability-orbit-stage" aria-label="Method One capabilities orbit">
+        <div className="capability-gridlines" aria-hidden="true" />
+        <motion.div
+          className="capability-energy"
+          aria-hidden="true"
+          animate={{ scale: [0.9, 1.18, 1.36], opacity: [0.32, 0.16, 0] }}
+          transition={{ duration: 4.8, repeat: Infinity, ease: "easeOut" }}
+        />
+        {capabilityParticles.map(([left, top, x, y], index) => (
+          <motion.span
+            className="capability-particle"
+            aria-hidden="true"
+            key={`particle-${index}`}
+            style={{ left: `${left}%`, top: `${top}%` }}
+            animate={{ x: [0, x, x * 1.08], y: [0, y, y * 1.08], opacity: [0, 0.5, 0], scale: [0.5, 1, 0.7] }}
+            transition={{ duration: 5.8 + index * 0.18, delay: index * 0.24, repeat: Infinity, ease: "easeOut" }}
+          />
+        ))}
+        <motion.div
+          className="capability-sun-core"
+          initial={{ opacity: 0, scale: 0.86 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ amount: 0.35, once: false }}
+          transition={{ duration: 0.72, ease: "easeOut" }}
+        >
+          <motion.img
+            src={BRAND_SUN_LOGO}
+            alt="Method One sun logo"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
+            decoding="async"
+          />
+        </motion.div>
         {capabilities.map((item, index) => (
-          <article className="capability-item reveal" key={item}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <h3>{item}</h3>
-          </article>
+          <motion.article
+            className="capability-pod"
+            key={item}
+            style={{ left: `${capabilityPodPositions[index][0]}%`, top: `${capabilityPodPositions[index][1]}%` }}
+            initial={{ opacity: 0, scale: 0.8, rotate: index % 2 === 0 ? -7 : 7 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ amount: 0.2, once: false }}
+            transition={{ duration: 0.62, delay: index * 0.045, ease: "easeOut" }}
+          >
+            <motion.div
+              className="capability-pod-inner"
+              animate={{
+                x: [0, index % 2 === 0 ? 5 : -5, 0, index % 2 === 0 ? -4 : 4, 0],
+                y: [0, index % 3 === 0 ? -5 : 4, 0, index % 3 === 0 ? 4 : -5, 0],
+                rotate: [0, index % 2 === 0 ? 1.2 : -1.2, 0, index % 2 === 0 ? -1 : 1, 0],
+              }}
+              transition={{ duration: 8 + index * 0.35, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{item}</h3>
+            </motion.div>
+          </motion.article>
         ))}
       </div>
     </section>

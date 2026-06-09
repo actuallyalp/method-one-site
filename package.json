@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "framer-motion": "^12.40.0",
     "gsap": "^3.12.7",
     "lenis": "^1.1.20",
     "react": "latest",

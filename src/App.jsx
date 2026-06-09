@@ -137,9 +137,21 @@ function easeInOutQuart(progress) {
   return progress < 0.5 ? 8 * progress * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 4) / 2;
 }
 
-function getSectionTop(target) {
+function getNavTargetY(sectionId) {
+  const target = document.getElementById(sectionId);
+  if (!target) return window.scrollY;
+
   const trigger = ScrollTrigger.getAll().find((item) => item.trigger === target);
-  return trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
+  const sectionTop = trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
+  const sectionDistance = trigger ? trigger.end - trigger.start : target.offsetHeight;
+  const headerOffset = document.querySelector(".site-header")?.offsetHeight ?? 0;
+
+  if (sectionId === "performance") return sectionTop + sectionDistance * 0.55;
+  if (sectionId === "capabilities") return sectionTop + sectionDistance * 0.3;
+  if (sectionId === "process") return sectionTop + sectionDistance * 0.5;
+  if (sectionId === "rfq") return sectionTop + sectionDistance * 0.45;
+
+  return sectionTop - headerOffset;
 }
 
 function getBriefcaseTrigger() {
@@ -231,7 +243,7 @@ function scrollToScene(event, id) {
   event.preventDefault();
   ScrollTrigger.refresh();
   ScrollTrigger.update();
-  const top = prepareBriefcaseForNav(target, getSectionTop(target));
+  const top = prepareBriefcaseForNav(target, getNavTargetY(id));
   smoothScrollToY(top).then((completed) => {
     if (completed) window.history.pushState(null, "", `#${id}`);
   });

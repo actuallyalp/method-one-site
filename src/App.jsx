@@ -110,17 +110,6 @@ const capabilityParticles = [
   [50, 50, -178, -42],
 ];
 
-const differentiators = [
-  "Account representatives available from 4AM PST",
-  "Emails responded to within minutes",
-  "Same-day results for urgent requirements",
-  "Stock verified before quotes",
-  "Delivery timeframes of 1 to 3 business days",
-  "Free overnight shipping during emergency situations",
-  "Performance during shortages, backorders, and nationwide disruptions",
-  "No lead-time supplies. No backorders. No delays.",
-];
-
 const processSteps = [
   "RFQ received",
   "Requirement reviewed",
@@ -384,7 +373,7 @@ function usePageAnimations(reducedMotion, enabled = true) {
     const isCompact = window.matchMedia("(max-width: 760px)").matches;
 
     if (reducedMotion) {
-      gsap.set(".reveal, .agency-node, .capability-pod, .principle, .vendor-card, .rfq-panel", {
+      gsap.set(".reveal, .agency-node, .capability-pod, .vendor-card, .rfq-panel", {
         opacity: 1,
         y: 0,
         clearProps: "transform",
@@ -550,10 +539,13 @@ function usePageAnimations(reducedMotion, enabled = true) {
           },
         });
 
-        tl.fromTo(".principles-section .section-copy", { opacity: 0, x: -90 }, { opacity: 1, x: 0, duration: 0.55 })
-          .fromTo(".principle", { opacity: 0, rotateX: 16, y: 70 }, { opacity: 1, rotateX: 0, y: 0, stagger: 0.08, duration: 0.9 }, "<0.12")
-          .to(".principle", { z: (index) => (index % 2 ? 48 : -28), y: (index) => (index % 2 ? -18 : 18), duration: 0.9 }, ">")
-          .to(".principles-grid", { opacity: 0.28, scale: 0.92, duration: 0.65 }, ">");
+        tl.fromTo(
+          ".principles-section .section-copy",
+          { opacity: 0, y: 42, filter: "blur(10px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 },
+        )
+          .to(".principles-section .section-copy", { y: -18, duration: 0.9 })
+          .to(".principles-section .section-copy", { opacity: 0.78, y: -42, duration: 0.65 }, ">");
       }),
     );
 
@@ -812,17 +804,8 @@ function BriefcaseReveal() {
 function Differentiators() {
   return (
     <section className="content-section principles-section">
-      <div className="section-copy reveal">
-        <div className="eyebrow">Operating Principles</div>
-        <h2>Concise standards for shortage conditions, backorders, and urgent procurement.</h2>
-      </div>
-      <div className="principles-grid">
-        {differentiators.map((item) => (
-          <article className="principle reveal" key={item}>
-            <span aria-hidden="true">✓</span>
-            <p>{item}</p>
-          </article>
-        ))}
+      <div className="section-copy">
+        <h2>No lead-time supplies. No backorders. No delays.</h2>
       </div>
     </section>
   );

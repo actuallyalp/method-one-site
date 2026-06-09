@@ -270,7 +270,6 @@ p {
 .rfq-form button,
 .agency-node,
 .capability-pod,
-.principle,
 .vendor-card {
   transition: transform 240ms ease, border-color 240ms ease, background 240ms ease, box-shadow 240ms ease;
 }
@@ -427,8 +426,10 @@ p {
   z-index: 5;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 12px;
   align-content: stretch;
+  align-items: stretch;
 }
 
 .agency-node {
@@ -437,6 +438,7 @@ p {
   grid-template-columns: 46px 1fr;
   gap: 13px;
   height: 100%;
+  align-items: start;
   min-width: 0;
   min-height: 0;
   padding: 14px;
@@ -448,7 +450,6 @@ p {
 
 .agency-node:hover,
 .capability-pod:hover .capability-pod-inner,
-.principle:hover,
 .vendor-card:hover {
   transform: translateY(-6px) translateZ(34px);
   border-color: rgba(192, 24, 28, 0.55);
@@ -920,36 +921,24 @@ p {
 }
 
 .principles-section {
-  min-height: auto;
-}
-
-.principles-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 48px;
-  transform-style: preserve-3d;
+  min-height: 100svh;
+  place-items: start center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(142, 9, 11, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(7, 10, 15, 0.78), rgba(17, 25, 35, 0.46) 54%, rgba(5, 7, 11, 0.82));
 }
 
-.principle {
-  min-height: 148px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.045);
-  padding: 20px;
-  backdrop-filter: blur(10px);
+.principles-section .section-copy {
+  width: min(980px, calc(100% - 36px));
+  margin-top: clamp(112px, 22vh, 190px);
+  text-align: center;
 }
 
-.principle span {
-  color: var(--accent-bright);
-  font-size: 1.15rem;
-  font-weight: 950;
-}
-
-.principle p {
-  margin-top: 18px;
-  color: var(--soft);
-  font-size: 0.94rem;
-  line-height: 1.45;
+.principles-section .section-copy h2 {
+  font-size: clamp(2.35rem, 5vw, 5.6rem);
+  text-shadow: 0 0 36px rgba(142, 9, 11, 0.34);
 }
 
 .process-pin {
@@ -1313,7 +1302,6 @@ p {
     inset: clamp(310px, 38vh, 390px) 18px 5vh;
   }
 
-  .principles-grid,
   .naics-panel {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1426,7 +1414,6 @@ p {
     transform: none;
   }
 
-  .principles-grid,
   .vendor-layout,
   .naics-panel,
   .rfq-form {

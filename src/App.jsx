@@ -14,6 +14,7 @@ const BRAND_LOGO = "/assets/brand/method-one-logo.png";
 const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";
 const COMPANY_NAME = "Method One Solutions";
 const WEBSITE_URL = "https://www.methodonesolutions.com";
+let activeLenis = null;
 
 const performance = [
   {
@@ -133,10 +134,32 @@ function scrollToScene(event, id) {
   const target = document.getElementById(id);
   if (!target) return;
   event.preventDefault();
+  ScrollTrigger.refresh();
+  ScrollTrigger.update();
   const trigger = ScrollTrigger.getAll().find((item) => item.trigger === target);
   const top = trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
-  window.scrollTo({ top, behavior: "smooth" });
   window.history.pushState(null, "", `#${id}`);
+
+  const refreshAfterNavigation = () => {
+    ScrollTrigger.refresh();
+    ScrollTrigger.update();
+  };
+
+  window.requestAnimationFrame(() => {
+    ScrollTrigger.update();
+  });
+
+  if (activeLenis) {
+    activeLenis.scrollTo(top, {
+      duration: 0.62,
+      onComplete: refreshAfterNavigation,
+    });
+    window.setTimeout(refreshAfterNavigation, 760);
+    return;
+  }
+
+  window.scrollTo({ top, behavior: "smooth" });
+  window.setTimeout(refreshAfterNavigation, 760);
 }
 
 function SiteHeader({ legalPage = false }) {
@@ -204,6 +227,7 @@ function useScrollSystems(reducedMotion, enabled = true) {
       touchMultiplier: 1,
       lerp: 0.14,
     });
+    activeLenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -216,6 +240,7 @@ function useScrollSystems(reducedMotion, enabled = true) {
 
     return () => {
       gsap.ticker.remove(raf);
+      if (activeLenis === lenis) activeLenis = null;
       lenis.destroy();
     };
   }, [enabled, reducedMotion]);

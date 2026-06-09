@@ -219,7 +219,7 @@ p {
   margin-top: 22px;
   max-width: 980px;
   overflow: visible;
-  padding-bottom: 0.05em;
+  padding-bottom: 0.08em;
   font-size: clamp(2.8rem, 7.55vw, 7.9rem);
   font-weight: 850;
   line-height: 0.94;

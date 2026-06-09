@@ -337,7 +337,7 @@ function useScrollSystems(reducedMotion, enabled = true) {
     const lenis = new Lenis({
       duration: 0.62,
       smoothWheel: true,
-      wheelMultiplier: 0.88,
+      wheelMultiplier: 1.1,
       touchMultiplier: 1,
       lerp: 0.14,
     });

@@ -197,6 +197,7 @@ textarea {
 
 .hero-content {
   width: min(980px, 100%);
+  overflow: visible;
 }
 
 .eyebrow {
@@ -217,9 +218,11 @@ p {
 .hero-content h1 {
   margin-top: 22px;
   max-width: 980px;
-  font-size: clamp(3.1rem, 8.4vw, 8.8rem);
+  overflow: visible;
+  padding-bottom: 0.05em;
+  font-size: clamp(2.8rem, 7.55vw, 7.9rem);
   font-weight: 850;
-  line-height: 0.9;
+  line-height: 0.94;
   letter-spacing: 0;
 }
 

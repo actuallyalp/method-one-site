@@ -15,6 +15,9 @@ const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";
 const COMPANY_NAME = "Method One Solutions";
 const WEBSITE_URL = "https://www.methodonesolutions.com";
 let activeLenis = null;
+const isProgrammaticScrollRef = { current: false };
+let navScrollFrame = 0;
+let navScrollRun = 0;
 
 const performance = [
   {
@@ -130,36 +133,108 @@ function MethodLogo({ legalPage = false }) {
   );
 }
 
+function easeInOutQuart(progress) {
+  return progress < 0.5 ? 8 * progress * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+}
+
+function getSectionTop(target) {
+  const trigger = ScrollTrigger.getAll().find((item) => item.trigger === target);
+  return trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
+}
+
+function getBriefcaseTrigger() {
+  return ScrollTrigger.getAll().find((item) => item.trigger?.classList?.contains("briefcase-pin"));
+}
+
+function prepareBriefcaseForNav(target, targetY) {
+  const briefcaseTrigger = getBriefcaseTrigger();
+  if (!briefcaseTrigger?.animation) return targetY;
+  if (target.id === "briefcase") {
+    briefcaseTrigger.animation.progress(0);
+    return briefcaseTrigger.start;
+  }
+  if (targetY > briefcaseTrigger.end) {
+    briefcaseTrigger.animation.progress(1);
+  }
+  return targetY;
+}
+
+function refreshAfterNavigation() {
+  ScrollTrigger.refresh();
+  ScrollTrigger.update();
+  window.requestAnimationFrame(() => {
+    ScrollTrigger.update();
+  });
+}
+
+function smoothScrollToY(targetY, duration = 900) {
+  const run = ++navScrollRun;
+  if (navScrollFrame) window.cancelAnimationFrame(navScrollFrame);
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  const destination = Math.max(0, Math.min(targetY, maxScroll));
+  const startY = window.scrollY;
+  const distance = destination - startY;
+  const setScrollY = (scrollY) => {
+    if (activeLenis) {
+      activeLenis.scrollTo(scrollY, { immediate: true, force: true });
+      return;
+    }
+    window.scrollTo(0, scrollY);
+  };
+
+  if (Math.abs(distance) < 1) {
+    setScrollY(destination);
+    refreshAfterNavigation();
+    isProgrammaticScrollRef.current = false;
+    navScrollFrame = 0;
+    activeLenis?.start?.();
+    return Promise.resolve(true);
+  }
+
+  return new Promise((resolve) => {
+    const startTime = window.performance.now();
+    activeLenis?.start?.();
+    isProgrammaticScrollRef.current = true;
+
+    function tick(now) {
+      if (run !== navScrollRun) {
+        resolve(false);
+        return;
+      }
+
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeInOutQuart(progress);
+      setScrollY(startY + distance * eased);
+      ScrollTrigger.update();
+
+      if (progress < 1) {
+        navScrollFrame = window.requestAnimationFrame(tick);
+        return;
+      }
+
+      setScrollY(destination);
+      refreshAfterNavigation();
+      isProgrammaticScrollRef.current = false;
+      navScrollFrame = 0;
+      activeLenis?.start?.();
+      resolve(true);
+    }
+
+    navScrollFrame = window.requestAnimationFrame(tick);
+  });
+}
+
 function scrollToScene(event, id) {
   const target = document.getElementById(id);
   if (!target) return;
   event.preventDefault();
   ScrollTrigger.refresh();
   ScrollTrigger.update();
-  const trigger = ScrollTrigger.getAll().find((item) => item.trigger === target);
-  const top = trigger ? trigger.start : target.getBoundingClientRect().top + window.scrollY;
-  window.history.pushState(null, "", `#${id}`);
-
-  const refreshAfterNavigation = () => {
-    ScrollTrigger.refresh();
-    ScrollTrigger.update();
-  };
-
-  window.requestAnimationFrame(() => {
-    ScrollTrigger.update();
+  const top = prepareBriefcaseForNav(target, getSectionTop(target));
+  smoothScrollToY(top).then((completed) => {
+    if (completed) window.history.pushState(null, "", `#${id}`);
   });
-
-  if (activeLenis) {
-    activeLenis.scrollTo(top, {
-      duration: 0.62,
-      onComplete: refreshAfterNavigation,
-    });
-    window.setTimeout(refreshAfterNavigation, 760);
-    return;
-  }
-
-  window.scrollTo({ top, behavior: "smooth" });
-  window.setTimeout(refreshAfterNavigation, 760);
 }
 
 function SiteHeader({ legalPage = false }) {
@@ -229,7 +304,9 @@ function useScrollSystems(reducedMotion, enabled = true) {
     });
     activeLenis = lenis;
 
-    lenis.on("scroll", ScrollTrigger.update);
+    lenis.on("scroll", () => {
+      if (!isProgrammaticScrollRef.current) ScrollTrigger.update();
+    });
 
     function raf(time) {
       lenis.raf(time * 1000);

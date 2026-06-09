@@ -16,6 +16,10 @@ const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";
 const COMPANY_NAME = "Method One Solutions";
 const WEBSITE_URL = "https://www.methodonesolutions.com";
 let activeLenis = null;
+const isProgrammaticScrollRef = { current: false };
+let navScrollFrame = 0;
+let navScrollRun = 0;
+let navScrollFallbackTimeout = 0;
 
 const performance = [
   {
@@ -169,22 +173,44 @@ function getNavTargetY(sectionId) {
 
 function refreshAfterNavigation() {
   ScrollTrigger.update();
-  window.requestAnimationFrame(() => {
+  navScrollFrame = window.requestAnimationFrame(() => {
     ScrollTrigger.update();
+    navScrollFrame = 0;
   });
 }
 
+function cancelNavScroll() {
+  if (navScrollFrame) window.cancelAnimationFrame(navScrollFrame);
+  if (navScrollFallbackTimeout) window.clearTimeout(navScrollFallbackTimeout);
+  navScrollFrame = 0;
+  navScrollFallbackTimeout = 0;
+  navScrollRun += 1;
+  isProgrammaticScrollRef.current = false;
+  activeLenis?.start?.();
+}
+
 function scrollToY(targetY) {
+  cancelNavScroll();
+  const run = ++navScrollRun;
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   const destination = Math.max(0, Math.min(targetY, maxScroll));
+  isProgrammaticScrollRef.current = true;
 
   return new Promise((resolve) => {
     const finish = () => {
+      if (run !== navScrollRun) {
+        resolve(false);
+        return;
+      }
+
+      isProgrammaticScrollRef.current = false;
+      navScrollFallbackTimeout = 0;
       refreshAfterNavigation();
-      resolve();
+      resolve(true);
     };
 
     if (activeLenis) {
+      activeLenis.start();
       activeLenis.scrollTo(destination, {
         duration: 1.05,
         easing: easeInOutQuart,
@@ -194,7 +220,7 @@ function scrollToY(targetY) {
     }
 
     window.scrollTo({ top: destination, behavior: "smooth" });
-    window.setTimeout(finish, 1100);
+    navScrollFallbackTimeout = window.setTimeout(finish, 1100);
   });
 }
 
@@ -202,10 +228,9 @@ function scrollToScene(event, id) {
   const target = document.getElementById(id);
   if (!target) return;
   event.preventDefault();
-  ScrollTrigger.refresh();
   ScrollTrigger.update();
-  scrollToY(getNavTargetY(id)).then(() => {
-    window.history.pushState(null, "", `#${id}`);
+  scrollToY(getNavTargetY(id)).then((completed) => {
+    if (completed) window.history.pushState(null, "", `#${id}`);
   });
 }
 

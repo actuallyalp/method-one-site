@@ -935,7 +935,7 @@ function ContactSection() {
           <a href="tel:+18773219876"><span>Phone:</span> (877) 321-9876</a>
           <a href="mailto:service@methodonesolutions.com"><span>Email:</span> service@methodonesolutions.com</a>
           <p><span>Hours:</span> Mon-Fri 4am-6pm PST</p>
-          <a href="tel:+17149884222"><span>24-7 Emergency Support:</span> 714-988-4222</a>
+          <a href="tel:+17149884222"><span>24-7 Emergency Support:</span> (714) 988-4222</a>
         </div>
       </div>
     </section>

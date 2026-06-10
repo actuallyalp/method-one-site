@@ -167,6 +167,7 @@ function getNavTargetY(sectionId) {
   if (sectionId === "capabilities") return sectionTop + sectionDistance * 0.48;
   if (sectionId === "process") return sectionTop + sectionDistance * 0.5;
   if (sectionId === "rfq") return sectionTop + sectionDistance * 0.45;
+  if (sectionId === "contact") return sectionTop - headerOffset;
 
   return sectionTop - headerOffset;
 }
@@ -248,6 +249,7 @@ function SiteHeader({ legalPage = false }) {
         <a {...linkProps("capabilities")}>Capabilities</a>
         <a {...linkProps("process")}>Process</a>
         <a {...linkProps("rfq")}>RFQ</a>
+        <a {...linkProps("contact")}>Contact Us</a>
       </nav>
     </header>
   );
@@ -890,11 +892,6 @@ function RFQSection() {
         <div className="rfq-copy">
           <div className="eyebrow">RFQ Inquiry</div>
           <h2>Send the RFQ. We’ll verify stock fast.</h2>
-          <address>
-            <strong>Contact Us</strong>
-            <a href="tel:+18773219876">(877) 321-9876</a>
-            <a href="mailto:service@methodonesolutions.com">service@methodonesolutions.com</a>
-          </address>
         </div>
         <form onSubmit={handleSubmit} className="rfq-form">
           <label>Name<input name="name" value={formData.name} onChange={updateField} autoComplete="name" /></label>
@@ -916,6 +913,29 @@ function RFQSection() {
           <button disabled={status === "submitting"}>{status === "submitting" ? "Sending..." : "Submit RFQ"}</button>
           {message && <p className={`form-message ${status}`}>{message}</p>}
         </form>
+      </div>
+    </section>
+  );
+}
+
+function ContactSection() {
+  const particles = Array.from({ length: 18 }, (_, index) => index);
+
+  return (
+    <section id="contact" className="content-section contact-section">
+      <div className="contact-particle-bar contact-particle-bar-left" aria-hidden="true">
+        {particles.map((index) => <span key={`left-${index}`} />)}
+      </div>
+      <div className="contact-particle-bar contact-particle-bar-right" aria-hidden="true">
+        {particles.map((index) => <span key={`right-${index}`} />)}
+      </div>
+      <div className="contact-content">
+        <h2>Questions? Contact Us.</h2>
+        <div className="contact-details" aria-label="Contact information">
+          <a href="tel:+18773219876"><span>Phone:</span> (877) 321-9876</a>
+          <a href="mailto:service@methodonesolutions.com"><span>Email:</span> service@methodonesolutions.com</a>
+          <p><span>Hours:</span> Mon-Fri 4am-6pm PST</p>
+        </div>
       </div>
     </section>
   );
@@ -1174,6 +1194,7 @@ export default function App() {
       <ProcessSection />
       <VendorProfile />
       <RFQSection />
+      <ContactSection />
       <SiteFooter />
     </main>
   );

@@ -1481,6 +1481,7 @@ p {
   .hero-section {
     min-height: auto;
     padding-top: 96px;
+    padding-bottom: 52px;
   }
 
   .hero-telemetry {
@@ -1491,15 +1492,17 @@ p {
 
   .cinematic-section {
     min-height: auto;
+    padding-block: 72px;
   }
 
   .command-board {
     position: relative;
     inset: auto;
     display: grid;
-    gap: 12px;
-    margin-top: 34px;
-    padding: 14px;
+    gap: 14px;
+    margin-top: 28px;
+    padding: 12px;
+    overflow: visible;
   }
 
   .network-core,
@@ -1511,22 +1514,54 @@ p {
   .agency-node {
     position: static;
     width: 100%;
+    height: auto;
     min-height: auto;
+    grid-template-columns: 34px 1fr;
+    gap: 9px;
+    padding: 10px;
   }
 
   .agency-grid {
     position: static;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-rows: auto;
+    gap: 10px;
+  }
+
+  .agency-node[class*="node-"] {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   .agency-seal {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
   }
 
   .agency-seal img {
-    max-width: 32px;
-    max-height: 32px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .agency-code {
+    margin-bottom: 5px;
+    font-size: 0.58rem;
+  }
+
+  .agency-node h3 {
+    font-size: 0.68rem;
+    line-height: 1.15;
+  }
+
+  .agency-node strong {
+    margin-top: 4px;
+    font-size: 0.92rem;
+  }
+
+  .agency-node p {
+    margin-top: 5px;
+    font-size: 0.58rem;
+    line-height: 1.25;
   }
 
   .award-rail {
@@ -1591,14 +1626,16 @@ p {
 
   .briefcase-stage {
     position: relative;
-    min-height: 700px;
-    margin-top: 32px;
+    min-height: 620px;
+    margin-top: 28px;
+    place-items: start center;
     overflow: hidden;
   }
 
   .briefcase-unit {
-    width: min(360px, 78vw);
-    height: 224px;
+    width: min(330px, 76vw);
+    height: 206px;
+    margin-top: 54px;
   }
 
   .briefcase-body {
@@ -1610,43 +1647,57 @@ p {
   }
 
   .briefcase-handle {
-    width: 138px;
-    height: 62px;
+    width: 128px;
+    height: 56px;
   }
 
   .module-field {
-    left: 18px;
-    right: 18px;
-    top: 330px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    left: 14px;
+    right: 14px;
+    top: 292px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
     place-items: initial;
   }
 
   .module {
     position: static;
-    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+    padding: 9px 7px;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
   }
 
   .doc-layers {
-    right: auto;
+    left: 18px;
+    right: 18px;
     top: auto;
-    bottom: 96px;
+    bottom: 106px;
+    gap: 8px;
   }
 
   .doc-layer {
-    width: min(300px, 82vw);
+    width: 100%;
+    padding: 10px;
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
   }
 
-  .module {
-    min-width: 104px;
-    font-size: 0.68rem;
+  .briefcase-exit {
+    bottom: 24px;
+    padding: 14px;
   }
 
   .process-board {
-    grid-template-columns: 1fr;
-    margin-top: 34px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .process-step {
+    min-height: auto;
+    padding: 14px;
   }
 
   .rfq-form .full {

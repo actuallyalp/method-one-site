@@ -9,7 +9,7 @@ import "./App.css";
 gsap.registerPlugin(ScrollTrigger);
 
 const ACCENT = "#8E090B";
-const FORM_ENDPOINT = "https://formspree.io/f/mwvyvvpb";
+const FORM_ENDPOINT = "https://formspree.io/f/mzdqkzde";
 const CommandEnvironment = lazy(() => import("./CommandEnvironment.jsx"));
 const BRAND_LOGO = "/assets/brand/method-one-logo.png";
 const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";

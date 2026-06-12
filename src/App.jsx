@@ -878,7 +878,7 @@ function RFQSection() {
       if (!response.ok) throw new Error("RFQ submission failed");
 
       setStatus("success");
-      setMessage("RFQ sent. Method One will review the details and respond quickly.");
+      setMessage("RFQ sent. We'll reach back out shortly.");
       setFormData({ name: "", organization: "", email: "", phone: "", details: "", deliveryDate: "", sms_consent: false });
     } catch {
       setStatus("error");

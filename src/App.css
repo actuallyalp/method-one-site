@@ -340,6 +340,15 @@ p {
   width: min(760px, 100%);
 }
 
+.reveal,
+.section-copy,
+.rfq-panel {
+  opacity: 0;
+  transform: translateY(34px);
+  filter: blur(12px);
+  will-change: opacity, transform, filter;
+}
+
 .section-copy h2,
 .briefcase-copy h2,
 .rfq-copy h2 {
@@ -1733,6 +1742,14 @@ p {
     position: relative;
     inset: auto;
     margin-top: 36px;
+  }
+
+  .reveal,
+  .section-copy,
+  .rfq-panel {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 
   .agency-grid {

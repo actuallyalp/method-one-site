@@ -342,10 +342,11 @@ function usePageAnimations(reducedMotion, enabled = true) {
     const isCompact = window.matchMedia("(max-width: 760px)").matches;
 
     if (reducedMotion) {
-      gsap.set(".reveal, .agency-node, .capability-pod, .vendor-card, .rfq-panel", {
+      gsap.set(".reveal, .section-copy, .agency-node, .capability-pod, .vendor-card, .rfq-panel", {
         opacity: 1,
         y: 0,
-        clearProps: "transform",
+        filter: "blur(0px)",
+        clearProps: "transform,filter",
       });
       return () => ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     }
@@ -353,21 +354,17 @@ function usePageAnimations(reducedMotion, enabled = true) {
     contexts.push(
       gsap.context(() => {
         gsap.utils.toArray(".reveal").forEach((element) => {
-          gsap.fromTo(
-            element,
-            { opacity: 0, y: 34, filter: "blur(12px)" },
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.9,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: element,
-                start: "top 82%",
-              },
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: element,
+              start: "top 82%",
             },
-          );
+          });
         });
       }),
     );

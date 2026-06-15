@@ -901,10 +901,9 @@ function RFQSection() {
           <label className="sms-consent full">
             <input name="sms_consent" checked={formData.sms_consent} onChange={updateField} type="checkbox" />
             <span>
-              By checking this box, you agree to receive SMS messages from Method One Solutions related to conversational purposes,
-              including RFQ updates, procurement communication, order coordination, availability confirmations, service follow-ups,
-              and customer support. You may reply STOP to opt out at any time. Reply HELP for assistance. Message and data rates
-              may apply. Message frequency may vary. Learn more on our <a href="/privacy-policy">Privacy Policy</a> page and{" "}
+              By checking this box, you agree to receive SMS messages from Method One Solutions related to Conversational purposes.
+              You may reply STOP to opt out at any time. Reply HELP to (877) 321-9876 for assistance. Messages and data rates
+              may apply. Message frequency will vary. Learn more on our <a href="/privacy-policy">Privacy Policy</a> page and{" "}
               <a href="/terms-and-conditions">Terms &amp; Conditions</a>.
             </span>
           </label>
@@ -1013,7 +1012,6 @@ function PrivacyPolicyContent() {
       </LegalSection>
 
       <LegalSection title="5. SMS Communications">
-        <p>By opting into SMS from a web form or other medium, you are agreeing to receive SMS messages from Method One Solutions. This includes SMS messages for conversations related to our sales and lead generation services.</p>
         <p><strong>Message Frequency:</strong> Message frequency may vary based on your interactions with us.</p>
         <p><strong>Message &amp; Data Rates:</strong> Message and data rates may apply. Please consult your mobile carrier for details.</p>
         <p><strong>Opt-Out:</strong> To opt out at any time, text STOP to any message from us.</p>
@@ -1129,7 +1127,7 @@ function TermsContent() {
       </LegalSection>
 
       <LegalSection title="7. Opt-In Method">
-        <p>Users may opt in through the website form by checking the SMS consent checkbox.</p>
+        <p>Users may opt in to receive SMS messages from Method One Solutions through the website form by checking the SMS consent checkbox.</p>
       </LegalSection>
 
       <LegalSection title="8. Opt-Out Method">

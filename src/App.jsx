@@ -342,7 +342,7 @@ function usePageAnimations(reducedMotion, enabled = true) {
     const isCompact = window.matchMedia("(max-width: 760px)").matches;
 
     if (reducedMotion) {
-      gsap.set(".reveal, .section-copy, .agency-node, .capability-pod, .vendor-card, .rfq-panel", {
+      gsap.set(".reveal, .section-copy, .agency-node, .capability-pod, .vendor-card, .naics-panel, .rfq-panel, .rfq-form label", {
         opacity: 1,
         y: 0,
         filter: "blur(0px)",
@@ -353,7 +353,12 @@ function usePageAnimations(reducedMotion, enabled = true) {
 
     contexts.push(
       gsap.context(() => {
+        const pinnedTimelineReveal =
+          ".capabilities-section .section-copy, .principles-section .section-copy, .vendor-section .section-copy, .vendor-card, .naics-panel, .rfq-panel";
+
         gsap.utils.toArray(".reveal").forEach((element) => {
+          if (!isCompact && element.matches(pinnedTimelineReveal)) return;
+
           gsap.to(element, {
             opacity: 1,
             y: 0,
@@ -370,7 +375,7 @@ function usePageAnimations(reducedMotion, enabled = true) {
     );
 
     if (isCompact) {
-      gsap.set(".agency-node, .award-card, .module, .doc-layer, .briefcase-exit, .process-step, .document-stack span", {
+      gsap.set(".agency-node, .award-card, .module, .doc-layer, .briefcase-exit, .process-step, .document-stack span, .rfq-form label", {
         opacity: 1,
         y: 0,
         x: 0,
@@ -451,7 +456,7 @@ function usePageAnimations(reducedMotion, enabled = true) {
           },
         });
 
-        tl.fromTo(".capabilities-section .section-copy", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.5 })
+        tl.to(".capabilities-section .section-copy", { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5 })
           .fromTo(".capability-orbit-stage", { rotateX: 12, y: 64, scale: 0.94 }, { rotateX: 0, y: 0, scale: 1, duration: 0.8 }, "<0.15")
           .to(".capability-energy", { scale: 1.08, opacity: 0.9, duration: 0.9 }, "<0.2")
           .to(".capability-orbit-stage", { scale: 0.98, y: -22, duration: 0.65 }, ">");
@@ -505,11 +510,7 @@ function usePageAnimations(reducedMotion, enabled = true) {
           },
         });
 
-        tl.fromTo(
-          ".principles-section .section-copy",
-          { opacity: 0, y: 42, filter: "blur(10px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 },
-        )
+        tl.to(".principles-section .section-copy", { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 })
           .to(".principles-section .section-copy", { y: -18, duration: 0.9 })
           .to(".principles-section .section-copy", { opacity: 0.78, y: -42, duration: 0.65 }, ">");
       }),
@@ -552,8 +553,9 @@ function usePageAnimations(reducedMotion, enabled = true) {
           },
         });
 
-        tl.fromTo(".vendor-section .section-copy", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.5 })
-          .fromTo(".vendor-card", { opacity: 0, y: 80, rotateX: 18 }, { opacity: 1, y: 0, rotateX: 0, stagger: 0.12, duration: 0.7 }, "<0.12")
+        tl.to(".vendor-section .section-copy", { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5 })
+          .to(".vendor-card", { opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)", stagger: 0.12, duration: 0.7 }, "<0.12")
+          .to(".naics-panel", { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5 }, "<0.12")
           .fromTo(".naics-panel div", { opacity: 0, x: -32 }, { opacity: 1, x: 0, stagger: 0.035, duration: 0.9 }, ">-0.1")
           .to(".naics-panel div", { y: (index) => (index % 3 - 1) * 10, stagger: 0.02, duration: 0.75 }, ">")
           .to(".vendor-layout", { scale: 0.92, y: -70, opacity: 0.34, duration: 0.75 }, ">");
@@ -575,8 +577,8 @@ function usePageAnimations(reducedMotion, enabled = true) {
           },
         });
 
-        tl.fromTo(".rfq-panel", { opacity: 0, y: 110, scale: 0.9, rotateX: 12 }, { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 0.75 })
-          .fromTo(".rfq-form label", { opacity: 0, y: 28 }, { opacity: 1, y: 0, stagger: 0.06, duration: 0.55 }, "<0.2")
+        tl.to(".rfq-panel", { opacity: 1, y: 0, scale: 1, rotateX: 0, filter: "blur(0px)", duration: 0.75 })
+          .to(".rfq-form label", { opacity: 1, y: 0, stagger: 0.06, duration: 0.55 }, "<0.2")
           .to(".rfq-panel", { boxShadow: "0 0 120px rgba(142,9,11,.28)", duration: 0.7 }, ">")
           .to(".rfq-panel", { scale: 0.96, duration: 0.5 }, ">");
       }),

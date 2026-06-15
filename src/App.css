@@ -349,6 +349,38 @@ p {
   will-change: opacity, transform, filter;
 }
 
+.capabilities-section .section-copy {
+  transform: translateY(80px);
+}
+
+.vendor-section .section-copy {
+  transform: translateY(70px);
+}
+
+.vendor-card {
+  opacity: 0;
+  transform: translateY(80px) rotateX(18deg);
+  filter: blur(12px);
+  will-change: opacity, transform, filter;
+}
+
+.naics-panel {
+  opacity: 0;
+  transform: translateY(34px);
+  filter: blur(12px);
+  will-change: opacity, transform, filter;
+}
+
+.rfq-panel {
+  transform: translateY(110px) scale(0.9) rotateX(12deg);
+}
+
+.rfq-form label {
+  opacity: 0;
+  transform: translateY(28px);
+  will-change: opacity, transform;
+}
+
 .section-copy h2,
 .briefcase-copy h2,
 .rfq-copy h2 {
@@ -1746,7 +1778,10 @@ p {
 
   .reveal,
   .section-copy,
-  .rfq-panel {
+  .vendor-card,
+  .naics-panel,
+  .rfq-panel,
+  .rfq-form label {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;

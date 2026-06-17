@@ -712,7 +712,7 @@ function PerformanceBoard() {
     <section id="performance" className="performance-pin cinematic-section">
       <div className="section-copy reveal">
         <div className="eyebrow">Past Performance Command Board</div>
-        <h2>Supporting federal departments through backorders, shortages, and day-to-day operations.</h2>
+        <h2>Supporting federal departments through supply backorders and shortages.</h2>
       </div>
       <div className="command-board">
         <div className="board-sweep" aria-hidden="true" />
@@ -822,7 +822,7 @@ function BriefcaseReveal() {
     <section id="briefcase" className="briefcase-pin cinematic-section">
       <div className="briefcase-copy reveal">
         <div className="eyebrow">Pinned Capability Reveal</div>
-        <h2>Emergency RFQs enter a controlled medical supply sourcing sequence.</h2>
+        <h2>Emergency medical supply RFQs enter a controlled sourcing sequence.</h2>
       </div>
       <div className="briefcase-stage" aria-label="Animated briefcase capability reveal">
         <div className="case-light" aria-hidden="true" />

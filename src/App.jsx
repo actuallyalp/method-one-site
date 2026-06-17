@@ -27,7 +27,8 @@ let navScrollFallbackTimeout = 0;
 
 const routeMetadata = {
   "/": {
-    title: "Method One Solutions | Backordered and Emergency Medical Supply Sourcing",
+    title: "Method One Solutions",
+    socialTitle: "Method One Solutions | Backordered and Emergency Medical Supply Sourcing",
     description: SEO_DESCRIPTION,
     canonical: WEBSITE_URL,
     type: "website",
@@ -213,7 +214,7 @@ function useDocumentMetadata(route) {
 
     document.title = metadata.title;
     setMetaAttribute('meta[name="description"]', "content", metadata.description);
-    setMetaAttribute('meta[property="og:title"]', "content", metadata.title);
+    setMetaAttribute('meta[property="og:title"]', "content", metadata.socialTitle || metadata.title);
     setMetaAttribute('meta[property="og:description"]', "content", metadata.description);
     setMetaAttribute('meta[property="og:url"]', "content", metadata.canonical);
     setMetaAttribute('meta[property="og:type"]', "content", metadata.type);
@@ -222,7 +223,7 @@ function useDocumentMetadata(route) {
     setMetaAttribute('meta[property="og:image:height"]', "content", "630");
     setMetaAttribute('meta[property="og:site_name"]', "content", COMPANY_NAME);
     setMetaAttribute('meta[name="twitter:card"]', "content", "summary_large_image");
-    setMetaAttribute('meta[name="twitter:title"]', "content", metadata.title);
+    setMetaAttribute('meta[name="twitter:title"]', "content", metadata.socialTitle || metadata.title);
     setMetaAttribute('meta[name="twitter:description"]', "content", metadata.description);
     setMetaAttribute('meta[name="twitter:image"]', "content", SEO_IMAGE);
     setLinkAttribute("canonical", metadata.canonical);

@@ -15,11 +15,38 @@ const BRAND_LOGO = "/assets/brand/method-one-logo.png";
 const BRAND_SUN_LOGO = "/assets/brand/method-one-sun-logo.png";
 const COMPANY_NAME = "Method One Solutions";
 const WEBSITE_URL = "https://www.methodonesolutions.com";
+const SEO_DESCRIPTION =
+  "Method One Solutions helps federal and institutional buyers source backordered, hard-to-find, and emergency medical supplies, including surgical, dental, laboratory, PPE, office, technology, and operational products with expedited fulfillment support.";
+const SEO_IMAGE = `${WEBSITE_URL}/og-image.svg`;
+const LINKEDIN_URL = "https://www.linkedin.com/company/method-one-solutions/";
 let activeLenis = null;
 const isProgrammaticScrollRef = { current: false };
 let navScrollFrame = 0;
 let navScrollRun = 0;
 let navScrollFallbackTimeout = 0;
+
+const routeMetadata = {
+  "/": {
+    title: "Method One Solutions | Backordered and Emergency Medical Supply Sourcing",
+    description: SEO_DESCRIPTION,
+    canonical: WEBSITE_URL,
+    type: "website",
+  },
+  "/privacy-policy": {
+    title: "Privacy Policy | Method One Solutions",
+    description:
+      "Review the Method One Solutions Privacy Policy, including SMS communication terms, data collection practices, opt-out instructions, and contact information.",
+    canonical: `${WEBSITE_URL}/privacy-policy`,
+    type: "article",
+  },
+  "/terms-and-conditions": {
+    title: "Terms & Conditions | Method One Solutions",
+    description:
+      "Review the Method One Solutions Terms and Conditions for website use, RFQ communications, SMS consent, procurement updates, and standard messaging disclosures.",
+    canonical: `${WEBSITE_URL}/terms-and-conditions`,
+    type: "article",
+  },
+};
 
 const performance = [
   {
@@ -144,10 +171,71 @@ const naicsCodes = [
 
 function MethodLogo({ legalPage = false }) {
   return (
-    <a className="brand" href={legalPage ? "/" : "#top"} onClick={legalPage ? undefined : (event) => scrollToScene(event, "top")} aria-label="Method One Solutions home">
+    <a className="brand" href={legalPage ? "/" : "/#top"} onClick={legalPage ? undefined : (event) => scrollToScene(event, "top")} aria-label="Method One Solutions home">
       <img className="brand-logo" src={BRAND_LOGO} alt="Method One Solutions" width="230" height="53" decoding="async" />
     </a>
   );
+}
+
+function setMetaAttribute(selector, attribute, value) {
+  let element = document.head.querySelector(selector);
+  if (!element) {
+    element = document.createElement("meta");
+    const match = selector.match(/\[(name|property)="([^"]+)"\]/);
+    if (match) element.setAttribute(match[1], match[2]);
+    document.head.appendChild(element);
+  }
+  element.setAttribute(attribute, value);
+}
+
+function setLinkAttribute(rel, href) {
+  let element = document.head.querySelector(`link[rel="${rel}"]`);
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", rel);
+    document.head.appendChild(element);
+  }
+  element.setAttribute("href", href);
+}
+
+function useDocumentMetadata(route) {
+  useEffect(() => {
+    const metadata = routeMetadata[route] || routeMetadata["/"];
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: COMPANY_NAME,
+      url: WEBSITE_URL,
+      logo: `${WEBSITE_URL}${BRAND_LOGO}`,
+      description: SEO_DESCRIPTION,
+      sameAs: [LINKEDIN_URL],
+    };
+
+    document.title = metadata.title;
+    setMetaAttribute('meta[name="description"]', "content", metadata.description);
+    setMetaAttribute('meta[property="og:title"]', "content", metadata.title);
+    setMetaAttribute('meta[property="og:description"]', "content", metadata.description);
+    setMetaAttribute('meta[property="og:url"]', "content", metadata.canonical);
+    setMetaAttribute('meta[property="og:type"]', "content", metadata.type);
+    setMetaAttribute('meta[property="og:image"]', "content", SEO_IMAGE);
+    setMetaAttribute('meta[property="og:image:width"]', "content", "1200");
+    setMetaAttribute('meta[property="og:image:height"]', "content", "630");
+    setMetaAttribute('meta[property="og:site_name"]', "content", COMPANY_NAME);
+    setMetaAttribute('meta[name="twitter:card"]', "content", "summary_large_image");
+    setMetaAttribute('meta[name="twitter:title"]', "content", metadata.title);
+    setMetaAttribute('meta[name="twitter:description"]', "content", metadata.description);
+    setMetaAttribute('meta[name="twitter:image"]', "content", SEO_IMAGE);
+    setLinkAttribute("canonical", metadata.canonical);
+
+    let schemaElement = document.getElementById("organization-schema");
+    if (!schemaElement) {
+      schemaElement = document.createElement("script");
+      schemaElement.id = "organization-schema";
+      schemaElement.type = "application/ld+json";
+      document.head.appendChild(schemaElement);
+    }
+    schemaElement.textContent = JSON.stringify(schema);
+  }, [route]);
 }
 
 function easeInOutQuart(progress) {
@@ -237,7 +325,7 @@ function scrollToScene(event, id) {
 
 function SiteHeader({ legalPage = false }) {
   const linkProps = (id) => ({
-    href: legalPage ? `/#${id}` : `#${id}`,
+    href: `/#${id}`,
     onClick: legalPage ? undefined : (event) => scrollToScene(event, id),
   });
 
@@ -606,8 +694,8 @@ function Hero() {
           institutional buyers.
         </p>
         <div className="hero-actions">
-          <a className="primary-action" href="#rfq" onClick={(event) => scrollToScene(event, "rfq")}>Send RFQ</a>
-          <a className="secondary-action" href="#performance" onClick={(event) => scrollToScene(event, "performance")}>View Past Performance</a>
+          <a className="primary-action" href="/#rfq" onClick={(event) => scrollToScene(event, "rfq")}>Send RFQ</a>
+          <a className="secondary-action" href="/#performance" onClick={(event) => scrollToScene(event, "performance")}>View Past Performance</a>
         </div>
       </div>
       <aside className="hero-telemetry reveal" aria-label="Operating standards">
@@ -624,7 +712,7 @@ function PerformanceBoard() {
     <section id="performance" className="performance-pin cinematic-section">
       <div className="section-copy reveal">
         <div className="eyebrow">Past Performance Command Board</div>
-        <h2>Federal buying history mapped as an operating network.</h2>
+        <h2>Supporting federal departments through backorders, shortages, and day-to-day operations.</h2>
       </div>
       <div className="command-board">
         <div className="board-sweep" aria-hidden="true" />
@@ -734,7 +822,7 @@ function BriefcaseReveal() {
     <section id="briefcase" className="briefcase-pin cinematic-section">
       <div className="briefcase-copy reveal">
         <div className="eyebrow">Pinned Capability Reveal</div>
-        <h2>The RFQ enters a controlled sourcing sequence.</h2>
+        <h2>Emergency RFQs enter a controlled medical supply sourcing sequence.</h2>
       </div>
       <div className="briefcase-stage" aria-label="Animated briefcase capability reveal">
         <div className="case-light" aria-hidden="true" />
@@ -771,7 +859,7 @@ function BriefcaseReveal() {
 
 function Differentiators() {
   return (
-    <section className="content-section principles-section">
+    <section id="differentiators" className="content-section principles-section">
       <div className="section-copy">
         <h2>No lead-time supplies. No backorders. No delays.</h2>
       </div>
@@ -807,7 +895,7 @@ function ProcessSection() {
 
 function VendorProfile() {
   return (
-    <section className="content-section vendor-section">
+    <section id="vendor" className="content-section vendor-section">
       <div className="section-copy reveal">
         <div className="eyebrow">Vendor Profile</div>
         <h2>Compact federal identifiers and NAICS coverage.</h2>
@@ -1172,6 +1260,7 @@ export default function App() {
   const route = typeof window === "undefined" ? "/" : window.location.pathname.replace(/\/$/, "") || "/";
   const isLegalRoute = route === "/privacy-policy" || route === "/terms-and-conditions";
 
+  useDocumentMetadata(route);
   useScrollSystems(reducedMotion, !isLegalRoute);
   usePageAnimations(reducedMotion, !isLegalRoute);
 

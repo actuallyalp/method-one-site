@@ -747,7 +747,12 @@ p {
 }
 
 .briefcase-pin .briefcase-copy {
-  width: min(960px, 100%);
+  width: min(560px, calc(50vw - 72px));
+}
+
+.briefcase-pin .briefcase-copy h2 {
+  font-size: clamp(2.6rem, 3.45vw, 4rem);
+  line-height: 1;
 }
 
 .briefcase-stage {
